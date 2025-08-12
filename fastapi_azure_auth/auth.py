@@ -181,15 +181,20 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                 log.info('User denied, is a guest user', claims)
                 raise Forbidden(detail='Guest users not allowed', request=request)
 
-            for scope in security_scopes.scopes:
-                token_scope_string = claims.get('scp', '')
-                log.debug('Scopes: %s', token_scope_string)
-                if not isinstance(token_scope_string, str):
-                    raise Forbidden('Token contains invalid formatted scopes', request=request)
 
-                token_scopes = token_scope_string.split(' ')
-                if scope not in token_scopes:
-                    raise Forbidden('Required scope missing', request=request)
+            # Get the type of auth method and check if it's a public client using pkce or not.
+            # https://learn.microsoft.com/en-us/entra/identity-platform/access-token-claims-reference
+            is_public_client = claims.get("azpacr") == "0" or claims.get("appidacr") == "0"
+            if is_public_client:
+                for scope in security_scopes.scopes:
+                    token_scope_string = claims.get('scp', '')
+                    log.debug('Scopes: %s', token_scope_string)
+                    if not isinstance(token_scope_string, str):
+                        raise Forbidden('Token contains invalid formatted scopes', request=request)
+
+                    token_scopes = token_scope_string.split(' ')
+                    if scope not in token_scopes:
+                        raise Forbidden('Required scope missing', request=request)
             # Load new config if old
             await self.openid_config.load_config()
 
