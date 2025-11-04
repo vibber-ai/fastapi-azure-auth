@@ -14,7 +14,7 @@ log = logging.getLogger('fastapi_azure_auth')
 
 
 class HttpClientConfig(TypedDict):
-    verify: NotRequired[ssl.SSLContext]
+    verify: NotRequired[ssl.SSLContext | bool]
     trust_env: NotRequired[bool]
 
 
