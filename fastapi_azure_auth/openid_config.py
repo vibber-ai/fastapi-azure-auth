@@ -1,7 +1,6 @@
 import logging
 import ssl
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from typing import TYPE_CHECKING, Any, Dict, List, NotRequired, Optional, TypedDict
 
 import jwt
