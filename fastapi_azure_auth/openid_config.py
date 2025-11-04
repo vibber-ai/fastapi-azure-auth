@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import ssl
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict
 
 import jwt
 from fastapi import HTTPException, status
@@ -32,21 +32,21 @@ class HttpClientConfig(TypedDict):
 class OpenIdConfig:
     def __init__(
         self,
-        tenant_id: Optional[str] = None,
+        tenant_id: str | None = None,
         multi_tenant: bool = False,
-        app_id: Optional[str] = None,
-        config_url: Optional[str] = None,
-        http_client_config: Optional[HttpClientConfig] = None,
+        app_id: str | None = None,
+        config_url: str | None = None,
+        http_client_config: HttpClientConfig | None = None,
     ) -> None:
-        self.tenant_id: Optional[str] = tenant_id
-        self._config_timestamp: Optional[datetime] = None
+        self.tenant_id: str | None = tenant_id
+        self._config_timestamp: datetime | None = None
         self.multi_tenant: bool = multi_tenant
         self.app_id = app_id
         self.config_url = config_url
         self.http_client_config: HttpClientConfig = http_client_config or HttpClientConfig()
 
         self.authorization_endpoint: str
-        self.signing_keys: dict[str, 'AllowedPublicKeys']
+        self.signing_keys: dict[str, AllowedPublicKeys]
         self.token_endpoint: str
         self.issuer: str
 
@@ -107,7 +107,7 @@ class OpenIdConfig:
             jwks_response.raise_for_status()
             self._load_keys(jwks_response.json()['keys'])
 
-    def _load_keys(self, keys: List[Dict[str, Any]]) -> None:
+    def _load_keys(self, keys: list[dict[str, Any]]) -> None:
         """
         Create certificates based on signing keys and store them
         """
