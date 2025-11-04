@@ -14,6 +14,14 @@ log = logging.getLogger('fastapi_azure_auth')
 
 
 class HttpClientConfig(TypedDict):
+    """
+    Configuration for the HTTP client used to fetch the OpenID configuration.
+
+    verify - (optional) Either `True` to use an SSL context with the default CA bundle,
+        `False` to disable verification, or an instance of `ssl.SSLContext` to use a custom context.
+    trust_env - (optional) Enables or disables usage of environment variables for configuration.
+    """
+
     verify: NotRequired[ssl.SSLContext | bool]
     trust_env: NotRequired[bool]
 
