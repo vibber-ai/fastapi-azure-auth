@@ -40,9 +40,7 @@ class OpenIdConfig:
         self.multi_tenant: bool = multi_tenant
         self.app_id = app_id
         self.config_url = config_url
-        self.http_client_config: HttpClientConfig = (
-            http_client_config or HttpClientConfig()
-        )
+        self.http_client_config: HttpClientConfig = http_client_config or HttpClientConfig()
 
         self.authorization_endpoint: str
         self.signing_keys: dict[str, 'AllowedPublicKeys']
