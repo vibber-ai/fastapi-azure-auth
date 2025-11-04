@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import logging
 import ssl
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Any, Dict, List, NotRequired, Optional, TypedDict
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, TypedDict
 
 import jwt
 from fastapi import HTTPException, status
@@ -9,6 +11,7 @@ from httpx import AsyncClient
 
 if TYPE_CHECKING:  # pragma: no cover
     from jwt.algorithms import AllowedPublicKeys
+    from typing_extensions import NotRequired  # added in python 3.11
 
 log = logging.getLogger('fastapi_azure_auth')
 
