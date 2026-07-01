@@ -2,11 +2,11 @@
 name = "fastapi-azure-auth"
 version = "5.2.0"  # Remember to change in __init__.py as well
 description = "Easy and secure implementation of Azure Entra ID for your FastAPI APIs"
-authors = ["Jonas Krüger Svensson <jonas.svensson@intility.no>"]
+authors = ["Jonas Krüger Svensson <jonas@vibber.ai>"]
 readme = "README.md"
-homepage = "https://github.com/intility/fastapi-azure-auth"
-repository = "https://github.com/intility/fastapi-azure-auth"
-documentation = "https://github.com/intility/fastapi-azure-auth"
+homepage = "https://github.com/vibber-ai/fastapi-azure-auth"
+repository = "https://github.com/vibber-ai/fastapi-azure-auth"
+documentation = "https://github.com/vibber-ai/fastapi-azure-auth"
 keywords = [
     'ad',
     'async',

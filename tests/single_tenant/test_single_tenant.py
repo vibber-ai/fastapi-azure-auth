@@ -34,9 +34,7 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys):
             'claims': {
                 '_claim_names': {'groups': 'src1'},
                 '_claim_sources': {
-                    'src1': {
-                        'endpoint': 'https://graph.windows.net/intility_tenant_id/users/JONASGUID/getMemberObjects'
-                    }
+                    'src1': {'endpoint': 'https://graph.windows.net/vibber_tenant_id/users/JONASGUID/getMemberObjects'}
                 },
                 'aio': 'some long val',
                 'aud': 'oauth299-9999-9999-abcd-efghijkl1234567890',
@@ -44,25 +42,25 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys):
                 'azpacr': '0',
                 'exp': expires,
                 'iat': issued_at,
-                'iss': 'https://login.microsoftonline.com/intility_tenant/v2.0',
-                'name': 'Jonas Krüger Svensson / Intility AS',
+                'iss': 'https://login.microsoftonline.com/vibber_tenant/v2.0',
+                'name': 'Jonas Krüger Svensson / Vibber AS',
                 'nbf': issued_at,
                 'oid': '22222222-2222-2222-2222-222222222222',
-                'preferred_username': 'jonas.svensson@intility.no',
+                'preferred_username': 'jonas@vibber.ai',
                 'rh': 'some long val',
                 'roles': ['AdminUser'],
                 'scp': 'user_impersonation',
                 'sub': 'some long val',
-                'tid': 'intility_tenant_id',
+                'tid': 'vibber_tenant_id',
                 'uti': 'abcdefghijkl-mnopqrstu',
                 'ver': '2.0',
                 'wids': ['some long val'],
             },
             'is_guest': False,
-            'name': 'Jonas Krüger Svensson / Intility AS',
+            'name': 'Jonas Krüger Svensson / Vibber AS',
             'roles': ['AdminUser'],
             'scp': ['user_impersonation'],
-            'tid': 'intility_tenant_id',
+            'tid': 'vibber_tenant_id',
             'oid': '22222222-2222-2222-2222-222222222222',
             'sub': 'some long val',
             'acct': None,
@@ -86,11 +84,11 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys):
             'idtyp': None,
             'in_corp': None,
             'ipaddr': None,
-            'iss': 'https://login.microsoftonline.com/intility_tenant/v2.0',
+            'iss': 'https://login.microsoftonline.com/vibber_tenant/v2.0',
             'login_hint': None,
             'nbf': issued_at,
             'onprem_sid': None,
-            'preferred_username': 'jonas.svensson@intility.no',
+            'preferred_username': 'jonas@vibber.ai',
             'pwd_exp': None,
             'pwd_url': None,
             'rh': 'some long val',
@@ -255,7 +253,7 @@ async def test_malformed_token(single_tenant_app, mock_openid_and_keys):
     assert response.status_code == 401
     assert (
         response.headers['www-authenticate']
-        == 'Bearer, authorization_uri="https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
+        == 'Bearer, authorization_uri="https://login.microsoftonline.com/vibber_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
     )
 
 
@@ -275,7 +273,7 @@ async def test_only_header(single_tenant_app, mock_openid_and_keys):
     assert response.status_code == 401
     assert (
         response.headers['www-authenticate']
-        == 'Bearer, authorization_uri="https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
+        == 'Bearer, authorization_uri="https://login.microsoftonline.com/vibber_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
     )
 
 
@@ -292,7 +290,7 @@ async def test_none_token(single_tenant_app, mock_openid_and_keys, mocker):
     assert response.status_code == 401
     assert (
         response.headers['www-authenticate']
-        == 'Bearer, authorization_uri="https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
+        == 'Bearer, authorization_uri="https://login.microsoftonline.com/vibber_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
     )
 
 
@@ -350,5 +348,5 @@ async def test_authentication_params_from_header(single_tenant_app):
     assert response.status_code == 401
     assert (
         response.headers['www-authenticate']
-        == 'Bearer, authorization_uri="https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
+        == 'Bearer, authorization_uri="https://login.microsoftonline.com/vibber_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
     )

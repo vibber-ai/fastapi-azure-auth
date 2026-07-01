@@ -14,7 +14,7 @@ solution before any time is spent on developing it.
 7. Create and run tests with full coverage by running `poetry run pytest --cov fastapi_azure_auth --cov-report=term-missing`
 8. Push the topic branch to your personal fork.
 9. Run `pre-commit run --all-files` locally to ensure proper linting.
-10. Create a pull request to the intility repository with a detailed summary of your changes and what motivated the change.
+10. Create a pull request to the upstream repository with a detailed summary of your changes and what motivated the change.
 
 If you need a more detailed walk through, please see this
-[issue comment](https://github.com/Intility/fastapi-azure-auth/issues/49#issuecomment-1056962282).
+[issue comment](https://github.com/vibber-ai/fastapi-azure-auth/issues/49#issuecomment-1056962282).

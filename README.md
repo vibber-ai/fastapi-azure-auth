@@ -1,6 +1,5 @@
 <h1 align="center">
-  <img margin="0 10px 0 0" src="https://avatars.githubusercontent.com/u/35199565" width="124px"/>
-  <img margin="0 10px 0 0" src="https://raw.githubusercontent.com/Intility/fastapi-azure-auth/main/docs/static/img/global/fastad.png" width="124px"/><br/>
+  <img margin="0 10px 0 0" src="https://raw.githubusercontent.com/vibber-ai/fastapi-azure-auth/main/docs/static/img/global/fastad.png" width="124px"/><br/>
   FastAPI-Azure-Auth
 </h1>
 
@@ -20,8 +19,8 @@
     </a>
     <!-- Line 2 -->
     <br/>
-    <a href="https://codecov.io/gh/intility/fastapi-azure-auth">
-        <img src="https://codecov.io/gh/intility/fastapi-azure-auth/branch/main/graph/badge.svg?token=BTFGII4GYR" alt="Codecov">
+    <a href="https://codecov.io/gh/vibber-ai/fastapi-azure-auth">
+        <img src="https://codecov.io/gh/vibber-ai/fastapi-azure-auth/branch/main/graph/badge.svg?token=BTFGII4GYR" alt="Codecov">
     </a>
     <a href="https://github.com/pre-commit/pre-commit">
         <img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white" alt="Pre-commit">
@@ -53,19 +52,19 @@
 
 > FastAPI is a modern, fast (high-performance), web framework for building APIs with Python, based on standard Python type hints.
 
-At Intility we use FastAPI for both internal (single-tenant) and customer-facing (multi-tenant) APIs. This package enables our developers (and you 😊) to create features without worrying about authentication and authorization.
+Vibber is the control plane for enterprise AI. The single place to build, run and manage AI agents. Production-ready in minutes, not months. This package enables our developers (and you 😊) to create features without worrying about authentication and authorization.
 
-Also, [we're hiring!](https://intility.no/en/career/)
+Also, [contact us!](mailto:jonas@vibber.ai)
 
 ## 📚 Resources
 
-The [documentation](https://intility.github.io/fastapi-azure-auth/) contains a full tutorial on how to configure Azure Entra ID
+The [documentation](https://vibber-ai.github.io/fastapi-azure-auth/) contains a full tutorial on how to configure Azure Entra ID
 and FastAPI for single- and multi-tenant applications as well as B2C apps. It includes examples on how to lock down
 your APIs to certain scopes, tenants, roles etc. For first time users it's strongly advised to set up your
 application exactly how it's described there, and then alter it to your needs later.
 
-[**MIT License**](https://github.com/Intility/fastapi-azure-auth/blob/main/LICENSE)
-| [**Documentation**](https://intility.github.io/fastapi-azure-auth/)
+[**MIT License**](https://github.com/vibber-ai/fastapi-azure-auth/blob/main/LICENSE)
+| [**Documentation**](https://vibber-ai.github.io/fastapi-azure-auth/)
 | [**GitHub**](https://github.com/snok/django-guid)
 
 
@@ -73,7 +72,7 @@ application exactly how it's described there, and then alter it to your needs la
 
 This is a tl;dr intended to give you an idea of what this package does and how to use it.
 For a more in-depth tutorial and settings reference you should read the
-[documentation](https://intility.github.io/fastapi-azure-auth/).
+[documentation](https://vibber-ai.github.io/fastapi-azure-auth/).
 
 
 #### 1. Install this library:
@@ -102,7 +101,7 @@ app = FastAPI(
 Ensure you have CORS enabled for your local environment, such as `http://localhost:8000`.
 
 #### 4. Configure FastAPI-Azure-Auth
-Configure either [`SingleTenantAzureAuthorizationCodeBearer`](https://intility.github.io/fastapi-azure-auth/settings/single_tenant), [`MultiTenantAzureAuthorizationCodeBearer`](https://intility.github.io/fastapi-azure-auth/settings/multi_tenant) or [`B2CMultiTenantAuthorizationCodeBearer`](https://intility.github.io/fastapi-azure-auth/settings/b2c)
+Configure either [`SingleTenantAzureAuthorizationCodeBearer`](https://vibber-ai.github.io/fastapi-azure-auth/settings/single_tenant), [`MultiTenantAzureAuthorizationCodeBearer`](https://vibber-ai.github.io/fastapi-azure-auth/settings/multi_tenant) or [`B2CMultiTenantAuthorizationCodeBearer`](https://vibber-ai.github.io/fastapi-azure-auth/settings/b2c)
 
 
 ```python
@@ -131,7 +130,7 @@ azure_scheme = MultiTenantAzureAuthorizationCodeBearer(
 )
 ```
 To validate the `iss`, configure an
-[`iss_callable`](https://intility.github.io/fastapi-azure-auth/multi-tenant/accept_specific_tenants_only).
+[`iss_callable`](https://vibber-ai.github.io/fastapi-azure-auth/multi-tenant/accept_specific_tenants_only).
 
 #### 5. Configure dependencies
 
