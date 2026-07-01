@@ -67,7 +67,7 @@ def generate_azure_scheme_multi_tenant_object(issuer=None, auto_error=True):
     """
 
     async def issuer_fetcher(tid):
-        tids = {'intility_tenant_id': 'https://login.microsoftonline.com/intility_tenant/v2.0'}
+        tids = {'vibber_tenant_id': 'https://login.microsoftonline.com/vibber_tenant/v2.0'}
         return tids[tid]
 
     current_issuer = issuer_fetcher

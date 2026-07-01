@@ -33,7 +33,7 @@ class OpenIdConfig:
 
     async def load_config(self) -> None:
         """
-        Loads config from the Intility openid-config endpoint if it's over 24 hours old (or don't exist)
+        Loads config from the OpenID Connect metadata endpoint if it's over 24 hours old (or don't exist)
         """
         refresh_time = datetime.now() - timedelta(hours=24)
         if not self._config_timestamp or self._config_timestamp < refresh_time:

@@ -53,5 +53,5 @@ If there are issues, please try
 ### Deployment
 
 GitHub actions takes care of deployment. Any changes to the `docs` folder on the `main` branch will trigger
-the pipeline. You can see the documentation live at https://intility.github.io/fastapi-azure-auth/, and browse
+the pipeline. You can see the documentation live at https://vibber-ai.github.io/fastapi-azure-auth/, and browse
 the static files in the `gh-pages` branch.
