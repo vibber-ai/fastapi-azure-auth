@@ -36,6 +36,7 @@ classifiers = [
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
     'Topic :: Software Development',
     'Topic :: Software Development :: Libraries',
     'Topic :: Software Development :: Libraries :: Application Frameworks',
@@ -43,9 +44,9 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.11,<4.0"
 fastapi = ">0.68.0"
-cryptography = ">=43.0.1"
+cryptography = ">=48.0.1"
 httpx = ">0.18.2"
 pyjwt = "^2.8.0"
 
