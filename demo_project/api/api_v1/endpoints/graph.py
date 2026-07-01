@@ -2,10 +2,11 @@ from typing import Any
 
 import httpx
 import jwt
-from demo_project.api.dependencies import azure_scheme
-from demo_project.core.config import settings
 from fastapi import APIRouter, Depends, Request
 from httpx import AsyncClient
+
+from demo_project.api.dependencies import azure_scheme
+from demo_project.core.config import settings
 
 router = APIRouter()
 

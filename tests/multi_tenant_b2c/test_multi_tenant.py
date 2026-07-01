@@ -2,8 +2,11 @@ import time
 from datetime import datetime, timedelta
 
 import pytest
-from demo_project.main import app
 from httpx import ASGITransport, AsyncClient
+
+from demo_project.main import app
+from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
+from fastapi_azure_auth.openid_config import OpenIdConfig
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
@@ -13,9 +16,6 @@ from tests.utils import (
     build_access_token_normal_user,
     build_evil_access_token,
 )
-
-from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
-from fastapi_azure_auth.openid_config import OpenIdConfig
 
 
 @pytest.mark.anyio

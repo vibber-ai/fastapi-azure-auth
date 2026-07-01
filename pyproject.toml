@@ -43,7 +43,7 @@ classifiers = [
 ]
 dependencies = [
     "fastapi>0.68.0",
-    "cryptography>=43.0.1",
+    "cryptography>=48.0.1",
     "httpx>0.18.2",
     "pyjwt>=2.8.0,<3",
 ]
@@ -87,27 +87,16 @@ constraint-dependencies = ["httpcore>=1.0.9"]
 fix = true
 line-length = 120
 target-version = 'py311'
-include = ['\.pyi?$']
-exclude = ['''
-(
-    (\.eggs|\.git|\.hg|\.mypy_cache|\.tox|\.venv|\venv|\.github|\docs|\tests|\__pycache__)
-)
-''']
+
+[tool.ruff.lint]
+# Defaults plus import sorting (replaces isort) and modern-syntax upgrades (replaces pyupgrade)
+extend-select = ["I", "UP"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+known-first-party = ["fastapi_azure_auth"]
 
 [tool.ruff.format]
 docstring-code-format = true
 line-ending = "lf"
 quote-style = "single"
-
-[tool.isort]
-profile = "black"
-src_paths = ["fastapi_azure_auth"]
-combine_as_imports = true
-line_length = 120
-sections = [
-    'FUTURE',
-    'STDLIB',
-    'THIRDPARTY',
-    'FIRSTPARTY',
-    'LOCALFOLDER',
-]

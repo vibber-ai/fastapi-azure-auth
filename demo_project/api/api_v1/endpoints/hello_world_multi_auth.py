@@ -1,9 +1,7 @@
-from typing import Dict, Union
+from fastapi import APIRouter, Depends, Request
 
 from demo_project.api.dependencies import multi_auth, multi_auth_b2c
 from demo_project.schemas.hello_world import TokenType
-from fastapi import APIRouter, Depends, Request
-
 from fastapi_azure_auth.user import User
 
 router = APIRouter()
@@ -16,7 +14,7 @@ router = APIRouter()
     name='hello_world_api_key',
     operation_id='helloWorldApiKeyMultiAuth',
 )
-async def world(request: Request, auth: Union[str, User] = Depends(multi_auth)) -> Dict[str, bool]:
+async def world(request: Request, auth: str | User = Depends(multi_auth)) -> dict[str, bool]:
     """
     Wonder how this auth is done?
     """
@@ -33,7 +31,7 @@ async def world(request: Request, auth: Union[str, User] = Depends(multi_auth)) 
     name='hello_world_api_key',
     operation_id='helloWorldApiKeyMultiAuthB2C',
 )
-async def world_b2c(request: Request, auth: Union[str, User] = Depends(multi_auth_b2c)) -> Dict[str, bool]:
+async def world_b2c(request: Request, auth: str | User = Depends(multi_auth_b2c)) -> dict[str, bool]:
     """
     Wonder how this auth is done?
     """

@@ -2,10 +2,14 @@ import time
 from datetime import datetime, timedelta
 
 import pytest
+from httpx import ASGITransport, AsyncClient
+
 from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings
 from demo_project.main import app
-from httpx import ASGITransport, AsyncClient
+from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
+from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
+from fastapi_azure_auth.exceptions import UnauthorizedHttp
 from tests.multi_tenant.conftest import generate_azure_scheme_multi_tenant_object
 from tests.utils import (
     build_access_token,
@@ -16,10 +20,6 @@ from tests.utils import (
     build_access_token_normal_user,
     build_evil_access_token,
 )
-
-from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
-from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
-from fastapi_azure_auth.exceptions import UnauthorizedHttp
 
 
 @pytest.mark.anyio

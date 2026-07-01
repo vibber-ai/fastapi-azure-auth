@@ -1,4 +1,5 @@
 import pytest
+
 from demo_project.api.dependencies import azure_scheme
 from demo_project.main import app
 

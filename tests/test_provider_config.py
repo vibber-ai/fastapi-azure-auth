@@ -2,12 +2,12 @@ from datetime import datetime, timedelta
 
 import pytest
 from asgi_lifespan import LifespanManager
+from httpx import AsyncClient
+
 from demo_project.api.dependencies import azure_scheme
 from demo_project.main import app
-from httpx import AsyncClient
-from tests.utils import build_access_token, build_openid_keys, openid_configuration
-
 from fastapi_azure_auth.openid_config import OpenIdConfig
+from tests.utils import build_access_token, build_openid_keys, openid_configuration
 
 
 @pytest.mark.anyio

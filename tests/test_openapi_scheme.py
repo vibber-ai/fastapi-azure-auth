@@ -2,9 +2,10 @@ import fastapi
 import openapi_spec_validator
 import pydantic
 import pytest
-from demo_project.main import app
 from fastapi.testclient import TestClient
 from packaging import version
+
+from demo_project.main import app
 
 openapi_schema = {
     'openapi': '3.1.0',

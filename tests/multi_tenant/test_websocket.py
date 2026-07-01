@@ -1,12 +1,18 @@
 from typing import Annotated
 
 import pytest
-from demo_project.api.dependencies import azure_scheme
-from demo_project.core.config import settings
-from demo_project.main import app
 from fastapi import Depends, Security, WebSocket
 from fastapi.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
+
+from demo_project.api.dependencies import azure_scheme
+from demo_project.core.config import settings
+from demo_project.main import app
+from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
+from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
+from fastapi_azure_auth.exceptions import ForbiddenWebSocket, UnauthorizedWebSocket
+from fastapi_azure_auth.openid_config import OpenIdConfig
+from fastapi_azure_auth.user import User
 from tests.multi_tenant.conftest import generate_azure_scheme_multi_tenant_object
 from tests.utils import (
     build_access_token,
@@ -17,12 +23,6 @@ from tests.utils import (
     build_access_token_normal_user,
     build_evil_access_token,
 )
-
-from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
-from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
-from fastapi_azure_auth.exceptions import ForbiddenWebSocket, UnauthorizedWebSocket
-from fastapi_azure_auth.openid_config import OpenIdConfig
-from fastapi_azure_auth.user import User
 
 
 async def validate_is_admin_user(user: User = Depends(azure_scheme)) -> User:
