@@ -52,9 +52,9 @@
 
 > FastAPI is a modern, fast (high-performance), web framework for building APIs with Python, based on standard Python type hints.
 
-Vibber is the control plane for enterprise AI. The single place to build, run and manage AI agents. Production-ready in minutes, not months. This package enables our developers (and you 😊) to create features without worrying about authentication and authorization.
+This package enables our developers (and you 😊) to create features without worrying about authentication and authorization.
 
-Also, [contact us!](mailto:jonas@vibber.ai)
+Made by the people behind [Vibber](https://vibber.ai). Vibber is the control plane for enterprise AI. The single place to build, run and manage MCP servers. Production-ready in *minutes*, not months. Contact: `jonas+github@vibber.ai`
 
 ## 📚 Resources
 
