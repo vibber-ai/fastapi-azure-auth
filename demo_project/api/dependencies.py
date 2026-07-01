@@ -52,13 +52,13 @@ class IssuerFetcher:
             # logic to find your allowed tenants and it's issuers here
             # (This example cache in memory for 1 hour)
             self.tid_to_iss = {
-                'intility_tenant_id': 'https://login.microsoftonline.com/intility_tenant/v2.0',
+                'vibber_tenant_id': 'https://login.microsoftonline.com/vibber_tenant/v2.0',
             }
         try:
             return self.tid_to_iss[tid]
         except Exception as error:
             log.exception('`iss` not found for `tid` %s. Error %s', tid, error)
-            raise UnauthorizedHttp('You must be an Intility customer to access this resource')
+            raise UnauthorizedHttp('You must be a Vibber customer to access this resource')
 
 
 issuer_fetcher = IssuerFetcher()

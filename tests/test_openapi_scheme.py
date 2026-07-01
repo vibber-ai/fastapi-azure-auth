@@ -396,8 +396,8 @@ openapi_schema = {
                         'scopes': {
                             'api://oauth299-9999-9999-abcd-efghijkl1234567890/user_impersonation': '**No client secret needed, leave blank**'
                         },
-                        'authorizationUrl': 'https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize',
-                        'tokenUrl': 'https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/token',
+                        'authorizationUrl': 'https://login.microsoftonline.com/vibber_tenant_id/oauth2/v2.0/authorize',
+                        'tokenUrl': 'https://login.microsoftonline.com/vibber_tenant_id/oauth2/v2.0/token',
                     }
                 },
             },

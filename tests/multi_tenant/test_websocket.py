@@ -91,7 +91,7 @@ async def test_iss_callable_raise_error(mock_openid_and_keys):
         with client.websocket_connect('/ws', headers={'Authorization': 'Bearer ' + build_access_token()}):
             pass
     assert error.value.reason == str(
-        {'error': 'invalid_token', 'message': 'Tenant intility_tenant_id not a valid tenant'}
+        {'error': 'invalid_token', 'message': 'Tenant vibber_tenant_id not a valid tenant'}
     )
     assert error.value.code == 1008
 
@@ -108,7 +108,7 @@ async def test_skip_iss_validation(mock_openid_and_keys):
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
     with client.websocket_connect('/ws', headers={'Authorization': 'Bearer ' + build_access_token()}) as websocket:
         data = websocket.receive_text()
-        assert data == 'Hello, Jonas Krüger Svensson / Intility AS!'
+        assert data == 'Hello, Jonas Krüger Svensson / Vibber AS!'
 
 
 @pytest.mark.anyio

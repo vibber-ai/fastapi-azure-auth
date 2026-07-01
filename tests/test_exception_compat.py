@@ -1,6 +1,6 @@
 """
 This module tests the exception handling and backwards compatibility of the exceptions module, introduced in
-issue https://github.com/intility/fastapi-azure-auth/issues/229.
+issue https://github.com/vibber-ai/fastapi-azure-auth/issues/229.
 TODO: Remove this test module in v6.0.0
 """
 

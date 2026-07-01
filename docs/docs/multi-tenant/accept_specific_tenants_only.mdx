@@ -111,13 +111,13 @@ class IssuerFetcher:
             # logic to find your allowed tenants and it's issuers here
             # (This example cache in memory for 1 hour)
             self.tid_to_iss = {
-                'intility_tenant': 'intility_tenant',
+                'vibber_tenant': 'vibber_tenant',
             }
         try:
             return self.tid_to_iss[tid]
         except Exception as error:
             log.exception('`iss` not found for `tid` %s. Error %s', tid, error)
-            raise Unauthorized('You must be an Intility customer to access this resource')
+            raise Unauthorized('You must be a Vibber customer to access this resource')
 
 
 issuer_fetcher = IssuerFetcher()
