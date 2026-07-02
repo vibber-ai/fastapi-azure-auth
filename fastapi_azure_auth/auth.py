@@ -30,7 +30,7 @@ from fastapi_azure_auth.exceptions import (
     UnauthorizedHttp,
     UnauthorizedWebSocket,
 )
-from fastapi_azure_auth.openid_config import OpenIdConfig
+from fastapi_azure_auth.openid_config import HttpClientConfig, OpenIdConfig
 from fastapi_azure_auth.user import User
 from fastapi_azure_auth.utils import get_unverified_claims, get_unverified_header, is_guest
 
@@ -58,6 +58,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         openid_config_url: str | None = None,
         openapi_description: str | None = None,
         scheme_name: str = 'AzureAuthorizationCodeBearerBase',
+        http_client_config: HttpClientConfig | None = None,
     ) -> None:
         """
         Initialize settings.
@@ -108,6 +109,10 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         :param scheme_name: str
             The name of the security scheme to be used in OpenAPI documentation.
             Default is 'AzureAuthorizationCodeBearerBase'.
+        :param http_client_config: HttpClientConfig
+            Configuration for the HTTP client used to fetch the OpenID configuration and signing keys,
+            e.g. a custom SSL context. Note that these endpoints supply the token signing keys;
+            disabling certificate verification breaks the chain of trust for token validation.
         """
         self.auto_error = auto_error
         # Validate settings, making sure there's no misconfigured dependencies out there
@@ -124,6 +129,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             multi_tenant=self.multi_tenant,
             app_id=app_client_id if openid_config_use_app_id else None,
             config_url=openid_config_url or None,
+            http_client_config=http_client_config,
         )
 
         self.leeway: int = leeway
@@ -303,6 +309,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         openapi_token_url: str | None = None,
         openapi_description: str | None = None,
         scheme_name: str = 'AzureAD_PKCE_single_tenant',
+        http_client_config: HttpClientConfig | None = None,
     ) -> None:
         """
         Initialize settings for a single tenant application.
@@ -341,6 +348,10 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         :param scheme_name: str
             The name of the security scheme to be used in OpenAPI documentation.
             Default is 'AzureAD_PKCE_single_tenant'.
+        :param http_client_config: HttpClientConfig
+            Configuration for the HTTP client used to fetch the OpenID configuration and signing keys,
+            e.g. a custom SSL context. Note that these endpoints supply the token signing keys;
+            disabling certificate verification breaks the chain of trust for token validation.
         """
         super().__init__(
             app_client_id=app_client_id,
@@ -353,6 +364,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             openapi_authorization_url=openapi_authorization_url,
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
+            http_client_config=http_client_config,
         )
         self.scheme_name: str = scheme_name
 
@@ -372,6 +384,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         openapi_token_url: str | None = None,
         openapi_description: str | None = None,
         scheme_name: str = 'AzureAD_PKCE_multi_tenant',
+        http_client_config: HttpClientConfig | None = None,
     ) -> None:
         """
         Initialize settings for a multi-tenant application.
@@ -415,6 +428,10 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         :param scheme_name: str
             The name of the security scheme to be used in OpenAPI documentation.
             Default is 'AzureAD_PKCE_multi_tenant'.
+        :param http_client_config: HttpClientConfig
+            Configuration for the HTTP client used to fetch the OpenID configuration and signing keys,
+            e.g. a custom SSL context. Note that these endpoints supply the token signing keys;
+            disabling certificate verification breaks the chain of trust for token validation.
         """
         super().__init__(
             app_client_id=app_client_id,
@@ -429,6 +446,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             openapi_authorization_url=openapi_authorization_url,
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
+            http_client_config=http_client_config,
         )
         self.scheme_name: str = scheme_name
 
@@ -448,6 +466,7 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         openapi_token_url: str | None = None,
         openapi_description: str | None = None,
         scheme_name: str = 'AzureAD_PKCE_B2C_multi_tenant',
+        http_client_config: HttpClientConfig | None = None,
     ) -> None:
         """
         Initialize settings for a B2C multi-tenant application.
@@ -486,6 +505,10 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         :param scheme_name: str
             The name of the security scheme to be used in OpenAPI documentation.
             Default is 'AzureAD_PKCE_B2C_multi_tenant'.
+        :param http_client_config: HttpClientConfig
+            Configuration for the HTTP client used to fetch the OpenID configuration and signing keys,
+            e.g. a custom SSL context. Note that these endpoints supply the token signing keys;
+            disabling certificate verification breaks the chain of trust for token validation.
         """
         super().__init__(
             app_client_id=app_client_id,
@@ -501,5 +524,6 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             openapi_authorization_url=openapi_authorization_url,
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
+            http_client_config=http_client_config,
         )
         self.scheme_name: str = scheme_name
