@@ -426,7 +426,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "cryptography", specifier = ">=48.0.1" },
-    { name = "fastapi", specifier = ">0.68.0" },
+    { name = "fastapi", specifier = ">=0.111.1" },
     { name = "httpx", specifier = ">0.18.2" },
     { name = "pyjwt", specifier = ">=2.8.0,<3" },
 ]

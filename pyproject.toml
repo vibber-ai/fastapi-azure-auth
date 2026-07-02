@@ -42,7 +42,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "fastapi>0.68.0",
+    "fastapi>=0.111.1",
     "cryptography>=48.0.1",
     "httpx>0.18.2",
     "pyjwt>=2.8.0,<3",
