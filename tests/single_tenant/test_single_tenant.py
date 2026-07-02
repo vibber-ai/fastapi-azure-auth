@@ -2,8 +2,10 @@ import time
 from datetime import datetime, timedelta
 
 import pytest
+from httpx2 import ASGITransport, AsyncClient
+
 from demo_project.main import app
-from httpx import ASGITransport, AsyncClient
+from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
@@ -13,8 +15,6 @@ from tests.utils import (
     build_access_token_normal_user,
     build_evil_access_token,
 )
-
-from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
 
 
 @pytest.mark.anyio
@@ -34,9 +34,7 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys):
             'claims': {
                 '_claim_names': {'groups': 'src1'},
                 '_claim_sources': {
-                    'src1': {
-                        'endpoint': 'https://graph.windows.net/intility_tenant_id/users/JONASGUID/getMemberObjects'
-                    }
+                    'src1': {'endpoint': 'https://graph.windows.net/vibber_tenant_id/users/JONASGUID/getMemberObjects'}
                 },
                 'aio': 'some long val',
                 'aud': 'oauth299-9999-9999-abcd-efghijkl1234567890',
@@ -44,25 +42,25 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys):
                 'azpacr': '0',
                 'exp': expires,
                 'iat': issued_at,
-                'iss': 'https://login.microsoftonline.com/intility_tenant/v2.0',
-                'name': 'Jonas Krüger Svensson / Intility AS',
+                'iss': 'https://login.microsoftonline.com/vibber_tenant/v2.0',
+                'name': 'Jonas Krüger Svensson / Vibber AS',
                 'nbf': issued_at,
                 'oid': '22222222-2222-2222-2222-222222222222',
-                'preferred_username': 'jonas.svensson@intility.no',
+                'preferred_username': 'jonas@vibber.ai',
                 'rh': 'some long val',
                 'roles': ['AdminUser'],
                 'scp': 'user_impersonation',
                 'sub': 'some long val',
-                'tid': 'intility_tenant_id',
+                'tid': 'vibber_tenant_id',
                 'uti': 'abcdefghijkl-mnopqrstu',
                 'ver': '2.0',
                 'wids': ['some long val'],
             },
             'is_guest': False,
-            'name': 'Jonas Krüger Svensson / Intility AS',
+            'name': 'Jonas Krüger Svensson / Vibber AS',
             'roles': ['AdminUser'],
             'scp': ['user_impersonation'],
-            'tid': 'intility_tenant_id',
+            'tid': 'vibber_tenant_id',
             'oid': '22222222-2222-2222-2222-222222222222',
             'sub': 'some long val',
             'acct': None,
@@ -86,11 +84,11 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys):
             'idtyp': None,
             'in_corp': None,
             'ipaddr': None,
-            'iss': 'https://login.microsoftonline.com/intility_tenant/v2.0',
+            'iss': 'https://login.microsoftonline.com/vibber_tenant/v2.0',
             'login_hint': None,
             'nbf': issued_at,
             'onprem_sid': None,
-            'preferred_username': 'jonas.svensson@intility.no',
+            'preferred_username': 'jonas@vibber.ai',
             'pwd_exp': None,
             'pwd_url': None,
             'rh': 'some long val',
@@ -116,7 +114,9 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys):
 @pytest.mark.anyio
 async def test_no_keys_to_decode_with(single_tenant_app, mock_openid_and_empty_keys):
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {
@@ -129,7 +129,7 @@ async def test_no_keys_to_decode_with(single_tenant_app, mock_openid_and_empty_k
 @pytest.mark.anyio
 async def test_normal_user_rejected(single_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_normal_user()},
     ) as ac:
@@ -141,7 +141,7 @@ async def test_normal_user_rejected(single_tenant_app, mock_openid_and_keys):
 @pytest.mark.anyio
 async def test_guest_user_rejected(single_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_guest_user()},
     ) as ac:
@@ -153,7 +153,7 @@ async def test_guest_user_rejected(single_tenant_app, mock_openid_and_keys):
 @pytest.mark.anyio
 async def test_invalid_token_claims(single_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()},
     ) as ac:
@@ -166,7 +166,7 @@ async def test_invalid_token_claims(single_tenant_app, mock_openid_and_keys):
 @pytest.mark.anyio
 async def test_no_valid_keys_for_token(single_tenant_app, mock_openid_and_no_valid_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()},
     ) as ac:
@@ -181,7 +181,7 @@ async def test_no_valid_keys_for_token(single_tenant_app, mock_openid_and_no_val
 @pytest.mark.anyio
 async def test_no_valid_scopes(single_tenant_app, mock_openid_and_no_valid_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes()},
     ) as ac:
@@ -193,7 +193,7 @@ async def test_no_valid_scopes(single_tenant_app, mock_openid_and_no_valid_keys)
 @pytest.mark.anyio
 async def test_no_valid_invalid_scope(single_tenant_app, mock_openid_and_no_valid_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes()},
     ) as ac:
@@ -205,7 +205,7 @@ async def test_no_valid_invalid_scope(single_tenant_app, mock_openid_and_no_vali
 @pytest.mark.anyio
 async def test_no_valid_invalid_formatted_scope(single_tenant_app, mock_openid_and_no_valid_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes(scopes=None)},
     ) as ac:
@@ -220,7 +220,7 @@ async def test_no_valid_invalid_formatted_scope(single_tenant_app, mock_openid_a
 @pytest.mark.anyio
 async def test_expired_token(single_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_expired()},
     ) as ac:
@@ -234,7 +234,7 @@ async def test_expired_token(single_tenant_app, mock_openid_and_keys):
 async def test_evil_token(single_tenant_app, mock_openid_and_keys):
     """Kid matches what we expect, but it's not signed correctly"""
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_evil_access_token()},
     ) as ac:
@@ -248,14 +248,16 @@ async def test_evil_token(single_tenant_app, mock_openid_and_keys):
 async def test_malformed_token(single_tenant_app, mock_openid_and_keys):
     """A short token, that only has a broken header"""
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cI6IkpXVCJ9'}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cI6IkpXVCJ9'},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Invalid token format'}}
     assert response.status_code == 401
     assert (
         response.headers['www-authenticate']
-        == 'Bearer, authorization_uri="https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
+        == 'Bearer, authorization_uri="https://login.microsoftonline.com/vibber_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
     )
 
 
@@ -263,7 +265,7 @@ async def test_malformed_token(single_tenant_app, mock_openid_and_keys):
 async def test_only_header(single_tenant_app, mock_openid_and_keys):
     """Only header token, with a matching kid, so the rest of the logic will be called, but can't be validated"""
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={
             'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6InJlYWwgdGh1bWJ'
@@ -275,7 +277,7 @@ async def test_only_header(single_tenant_app, mock_openid_and_keys):
     assert response.status_code == 401
     assert (
         response.headers['www-authenticate']
-        == 'Bearer, authorization_uri="https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
+        == 'Bearer, authorization_uri="https://login.microsoftonline.com/vibber_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
     )
 
 
@@ -283,7 +285,7 @@ async def test_only_header(single_tenant_app, mock_openid_and_keys):
 async def test_none_token(single_tenant_app, mock_openid_and_keys, mocker):
     mocker.patch.object(AzureAuthorizationCodeBearerBase, 'extract_access_token', return_value=None)
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_expired()},
     ) as ac:
@@ -292,7 +294,7 @@ async def test_none_token(single_tenant_app, mock_openid_and_keys, mocker):
     assert response.status_code == 401
     assert (
         response.headers['www-authenticate']
-        == 'Bearer, authorization_uri="https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
+        == 'Bearer, authorization_uri="https://login.microsoftonline.com/vibber_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
     )
 
 
@@ -300,14 +302,14 @@ async def test_none_token(single_tenant_app, mock_openid_and_keys, mocker):
 async def test_exception_raised(single_tenant_app, mock_openid_and_keys, mocker):
     mocker.patch.object(AzureAuthorizationCodeBearerBase, 'validate', side_effect=ValueError('lol'))
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_expired()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Unable to process token'}}
     assert response.status_code == 401
-    print(f"header: {response.headers.get('www-authenticate')}")
+    print(f'header: {response.headers.get("www-authenticate")}')
     assert response.headers['www-authenticate'] == 'Bearer'
 
 
@@ -321,7 +323,9 @@ async def test_change_of_keys_works(single_tenant_app, mock_openid_ok_then_empty
     * Do request
     """
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.status_code == 200
@@ -329,7 +333,9 @@ async def test_change_of_keys_works(single_tenant_app, mock_openid_ok_then_empty
     freezer.move_to(datetime.now() + timedelta(hours=25))  # The keys fetched are now outdated
 
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token()},
     ) as ac:
         second_resonse = await ac.get('api/v1/hello')
     assert second_resonse.json() == {
@@ -345,10 +351,12 @@ async def test_authentication_params_from_header(single_tenant_app):
     * Send request with "Authorization: Bearer"
     * Validate response provides authorization uri and client id in header
     """
-    async with AsyncClient(app=app, base_url='http://test', headers={'Authorization': 'Bearer'}) as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url='http://test', headers={'Authorization': 'Bearer'}
+    ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.status_code == 401
     assert (
         response.headers['www-authenticate']
-        == 'Bearer, authorization_uri="https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
+        == 'Bearer, authorization_uri="https://login.microsoftonline.com/vibber_tenant_id/oauth2/v2.0/authorize", client_id="oauth299-9999-9999-abcd-efghijkl1234567890"'
     )

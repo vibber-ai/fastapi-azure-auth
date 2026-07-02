@@ -12,7 +12,7 @@ const config: Config = {
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/global/favicon.ico',
-  organizationName: 'Intility', // Usually your GitHub org/user name.
+  organizationName: 'vibber-ai', // Usually your GitHub org/user name.
   projectName: 'FastAPI-Azure-Auth', // Usually your repo name.
   themeConfig: {
     navbar: {
@@ -23,7 +23,7 @@ const config: Config = {
       },
       items: [
         {
-          href: 'https://github.com/Intility/FastAPI-Azure-Auth',
+          href: 'https://github.com/vibber-ai/fastapi-azure-auth',
           label: 'GitHub',
           position: 'right',
         },
@@ -37,15 +37,15 @@ const config: Config = {
           items: [
             {
               label: 'SECURITY.md',
-              href: 'https://github.com/Intility/FastAPI-Azure-Auth/blob/main/SECURITY.md',
+              href: 'https://github.com/vibber-ai/fastapi-azure-auth/blob/main/SECURITY.md',
             },
             {
-              label: 'jonas.svensson@intility.no',
-              href: 'mailto:jonas.svensson@intility.no',
+              label: 'jonas@vibber.ai',
+              href: 'mailto:jonas@vibber.ai',
             },
             {
-              label: 'Intility.com',
-              href: 'https://intility.com',
+              label: 'Vibber.ai',
+              href: 'https://vibber.ai',
             },
             {
               label: 'Azure',
@@ -54,7 +54,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Intility AS. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Vibber AS. Built with Docusaurus.`,
     },
   } satisfies Preset.ThemeConfig,
   presets: [
@@ -65,7 +65,7 @@ const config: Config = {
           id: 'docs',
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/Intility/FastAPI-Azure-Auth/edit/main/docs/',
+          editUrl: 'https://github.com/vibber-ai/fastapi-azure-auth/edit/main/docs/',
           sidebarCollapsible: false,
         },
         theme: {
@@ -82,7 +82,7 @@ const config: Config = {
   //       id: 'docs',
   //       routeBasePath: '/',
   //       sidebarPath: require.resolve('./sidebars.js'),
-  //       editUrl: 'https://github.com/Intility/FastAPI-Azure-Auth/edit/main/docs/',
+  //       editUrl: 'https://github.com/vibber-ai/fastapi-azure-auth/edit/main/docs/',
   //       sidebarCollapsible: false,
   //     },
   //   ],

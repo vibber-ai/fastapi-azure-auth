@@ -1,6 +1,7 @@
 import inspect
 import logging
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, Optional
+from collections.abc import Awaitable, Callable
+from typing import TYPE_CHECKING, Any
 
 import jwt
 from fastapi.exceptions import HTTPException
@@ -29,14 +30,12 @@ from fastapi_azure_auth.exceptions import (
     UnauthorizedHttp,
     UnauthorizedWebSocket,
 )
-from fastapi_azure_auth.openid_config import OpenIdConfig
+from fastapi_azure_auth.openid_config import HttpClientConfig, OpenIdConfig
 from fastapi_azure_auth.user import User
 from fastapi_azure_auth.utils import get_unverified_claims, get_unverified_header, is_guest
 
 if TYPE_CHECKING:  # pragma: no cover
     from jwt.algorithms import AllowedPublicKeys
-
-    from fastapi_azure_auth.openid_config import HttpClientConfig
 
 log = logging.getLogger('fastapi_azure_auth')
 
@@ -46,20 +45,20 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         self,
         app_client_id: str,
         auto_error: bool = True,
-        tenant_id: Optional[str] = None,
-        scopes: Optional[Dict[str, str]] = None,
+        tenant_id: str | None = None,
+        scopes: dict[str, str] | None = None,
         multi_tenant: bool = False,
         leeway: int = 0,
         validate_iss: bool = True,
-        iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
+        iss_callable: Callable[[str], Awaitable[str]] | None = None,
         allow_guest_users: bool = False,
         openid_config_use_app_id: bool = False,
-        openapi_authorization_url: Optional[str] = None,
-        openapi_token_url: Optional[str] = None,
-        openid_config_url: Optional[str] = None,
-        openapi_description: Optional[str] = None,
-        scheme_name: str = "AzureAuthorizationCodeBearerBase",
-        http_client_config: Optional["HttpClientConfig"] = None,
+        openapi_authorization_url: str | None = None,
+        openapi_token_url: str | None = None,
+        openid_config_url: str | None = None,
+        openapi_description: str | None = None,
+        scheme_name: str = 'AzureAuthorizationCodeBearerBase',
+        http_client_config: HttpClientConfig | None = None,
     ) -> None:
         """
         Initialize settings.
@@ -111,7 +110,9 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             The name of the security scheme to be used in OpenAPI documentation.
             Default is 'AzureAuthorizationCodeBearerBase'.
         :param http_client_config: HttpClientConfig
-            Configuration for the HTTP client used to fetch the OpenID configuration.
+            Configuration for the HTTP client used to fetch the OpenID configuration and signing keys,
+            e.g. a custom SSL context. Note that these endpoints supply the token signing keys;
+            disabling certificate verification breaks the chain of trust for token validation.
         """
         self.auto_error = auto_error
         # Validate settings, making sure there's no misconfigured dependencies out there
@@ -133,7 +134,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
 
         self.leeway: int = leeway
         self.validate_iss: bool = validate_iss
-        self.iss_callable: Optional[Callable[..., Any]] = iss_callable
+        self.iss_callable: Callable[..., Any] | None = iss_callable
         self.allow_guest_users = allow_guest_users
         # Define settings for `OAuth2AuthorizationCodeBearer` and OpenAPI Authorization
         self.authorization_url = openapi_authorization_url
@@ -161,7 +162,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         )
         self.model = self.oauth.model
 
-    async def __call__(self, request: HTTPConnection, security_scopes: SecurityScopes) -> Optional[User]:
+    async def __call__(self, request: HTTPConnection, security_scopes: SecurityScopes) -> User | None:
         """
         Extends call to also validate the token.
         """
@@ -268,15 +269,15 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                 return None
             raise InvalidRequest(detail='Unable to validate token', request=request) from error
 
-    async def extract_access_token(self, request: HTTPConnection) -> Optional[str]:
+    async def extract_access_token(self, request: HTTPConnection) -> str | None:
         """
         Extracts the access token from the request.
         """
         return await self.oauth(request=request)  # type: ignore[arg-type]
 
     def validate(
-        self, access_token: str, key: 'AllowedPublicKeys', iss: str, options: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, access_token: str, key: 'AllowedPublicKeys', iss: str, options: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Validates the token using the provided key and options.
         """
@@ -300,15 +301,15 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         app_client_id: str,
         tenant_id: str,
         auto_error: bool = True,
-        scopes: Optional[Dict[str, str]] = None,
+        scopes: dict[str, str] | None = None,
         leeway: int = 0,
         allow_guest_users: bool = False,
         openid_config_use_app_id: bool = False,
-        openapi_authorization_url: Optional[str] = None,
-        openapi_token_url: Optional[str] = None,
-        openapi_description: Optional[str] = None,
-        scheme_name: str = "AzureAD_PKCE_single_tenant",
-        http_client_config: Optional["HttpClientConfig"] = None,
+        openapi_authorization_url: str | None = None,
+        openapi_token_url: str | None = None,
+        openapi_description: str | None = None,
+        scheme_name: str = 'AzureAD_PKCE_single_tenant',
+        http_client_config: HttpClientConfig | None = None,
     ) -> None:
         """
         Initialize settings for a single tenant application.
@@ -348,7 +349,9 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             The name of the security scheme to be used in OpenAPI documentation.
             Default is 'AzureAD_PKCE_single_tenant'.
         :param http_client_config: HttpClientConfig
-            Configuration for the HTTP client used to fetch the OpenID configuration.
+            Configuration for the HTTP client used to fetch the OpenID configuration and signing keys,
+            e.g. a custom SSL context. Note that these endpoints supply the token signing keys;
+            disabling certificate verification breaks the chain of trust for token validation.
         """
         super().__init__(
             app_client_id=app_client_id,
@@ -371,17 +374,17 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         self,
         app_client_id: str,
         auto_error: bool = True,
-        scopes: Optional[Dict[str, str]] = None,
+        scopes: dict[str, str] | None = None,
         leeway: int = 0,
         validate_iss: bool = True,
-        iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
+        iss_callable: Callable[[str], Awaitable[str]] | None = None,
         allow_guest_users: bool = False,
         openid_config_use_app_id: bool = False,
-        openapi_authorization_url: Optional[str] = None,
-        openapi_token_url: Optional[str] = None,
-        openapi_description: Optional[str] = None,
-        scheme_name: str = "AzureAD_PKCE_multi_tenant",
-        http_client_config: Optional["HttpClientConfig"] = None,
+        openapi_authorization_url: str | None = None,
+        openapi_token_url: str | None = None,
+        openapi_description: str | None = None,
+        scheme_name: str = 'AzureAD_PKCE_multi_tenant',
+        http_client_config: HttpClientConfig | None = None,
     ) -> None:
         """
         Initialize settings for a multi-tenant application.
@@ -426,7 +429,9 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             The name of the security scheme to be used in OpenAPI documentation.
             Default is 'AzureAD_PKCE_multi_tenant'.
         :param http_client_config: HttpClientConfig
-            Configuration for the HTTP client used to fetch the OpenID configuration.
+            Configuration for the HTTP client used to fetch the OpenID configuration and signing keys,
+            e.g. a custom SSL context. Note that these endpoints supply the token signing keys;
+            disabling certificate verification breaks the chain of trust for token validation.
         """
         super().__init__(
             app_client_id=app_client_id,
@@ -451,17 +456,17 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         self,
         app_client_id: str,
         auto_error: bool = True,
-        scopes: Optional[Dict[str, str]] = None,
+        scopes: dict[str, str] | None = None,
         leeway: int = 0,
         validate_iss: bool = True,
-        iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
+        iss_callable: Callable[[str], Awaitable[str]] | None = None,
         openid_config_use_app_id: bool = False,
-        openid_config_url: Optional[str] = None,
-        openapi_authorization_url: Optional[str] = None,
-        openapi_token_url: Optional[str] = None,
-        openapi_description: Optional[str] = None,
-        scheme_name: str = "AzureAD_PKCE_B2C_multi_tenant",
-        http_client_config: Optional["HttpClientConfig"] = None,
+        openid_config_url: str | None = None,
+        openapi_authorization_url: str | None = None,
+        openapi_token_url: str | None = None,
+        openapi_description: str | None = None,
+        scheme_name: str = 'AzureAD_PKCE_B2C_multi_tenant',
+        http_client_config: HttpClientConfig | None = None,
     ) -> None:
         """
         Initialize settings for a B2C multi-tenant application.
@@ -501,7 +506,9 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             The name of the security scheme to be used in OpenAPI documentation.
             Default is 'AzureAD_PKCE_B2C_multi_tenant'.
         :param http_client_config: HttpClientConfig
-            Configuration for the HTTP client used to fetch the OpenID configuration.
+            Configuration for the HTTP client used to fetch the OpenID configuration and signing keys,
+            e.g. a custom SSL context. Note that these endpoints supply the token signing keys;
+            disabling certificate verification breaks the chain of trust for token validation.
         """
         super().__init__(
             app_client_id=app_client_id,

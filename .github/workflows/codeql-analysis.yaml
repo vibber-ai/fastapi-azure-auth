@@ -2,9 +2,9 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   schedule:
-    - cron: '0 07 * * 1'
+    - cron: "0 07 * * 1"
 
 jobs:
   analyze:
@@ -12,41 +12,31 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       security-events: write
-    strategy:
-      fail-fast: false
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           persist-credentials: false
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
-      - name: Install poetry
-        uses: snok/install-poetry@v1
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
         with:
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-
-      - name: Load cached venv
-        uses: actions/cache@v4.2.3
-        id: cache-venv
-        with:
-          path: .venv
-          key: ${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-0
+          activate-environment: true
+          enable-cache: true
 
       - name: Install dependencies
-        run: poetry install --no-interaction --no-root
-        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: uv sync --locked --all-extras --dev
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v4
         with:
           setup-python-dependencies: false
           languages: python
           queries: +security-extended
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v4

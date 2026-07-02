@@ -1,32 +1,37 @@
-from __future__ import annotations
-
 import logging
 import ssl
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Any, TypedDict
+from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
 
 import jwt
 from fastapi import HTTPException, status
-from httpx import AsyncClient
+from httpx2 import AsyncClient
 
 if TYPE_CHECKING:  # pragma: no cover
     from jwt.algorithms import AllowedPublicKeys
-    from typing_extensions import NotRequired  # added in python 3.11
 
 log = logging.getLogger('fastapi_azure_auth')
 
 
 class HttpClientConfig(TypedDict):
     """
-    Configuration for the HTTP client used to fetch the OpenID configuration.
+    Configuration for the HTTP client used to fetch the OpenID configuration and signing keys.
 
-    verify - (optional) Either `True` to use an SSL context with the default CA bundle,
-        `False` to disable verification, or an instance of `ssl.SSLContext` to use a custom context.
-    trust_env - (optional) Enables or disables usage of environment variables for configuration.
+    verify - (optional) `True` (the default) verifies TLS certificates against the OS trust store,
+        an `ssl.SSLContext` or a path to a CA bundle uses a custom trust configuration, and `False`
+        disables verification entirely.
+
+        .. warning::
+            This endpoint supplies the keys used to validate every access token. Disabling
+            verification allows an attacker who can intercept traffic to inject their own
+            signing keys, which breaks the entire chain of trust.
+    trust_env - (optional) Enables or disables reading proxy/SSL configuration from environment variables.
+    timeout - (optional) Request timeout in seconds. Defaults to 10.
     """
 
-    verify: NotRequired[ssl.SSLContext | bool]
+    verify: NotRequired[ssl.SSLContext | str | bool]
     trust_env: NotRequired[bool]
+    timeout: NotRequired[float]
 
 
 class OpenIdConfig:
@@ -43,7 +48,21 @@ class OpenIdConfig:
         self.multi_tenant: bool = multi_tenant
         self.app_id = app_id
         self.config_url = config_url
-        self.http_client_config: HttpClientConfig = http_client_config or HttpClientConfig()
+
+        # Validate eagerly and store a copy, so a typo'd key or a dict mutated by the caller
+        # can't surface as a confusing failure at the next config refresh.
+        unknown_keys = set(http_client_config or {}) - set(HttpClientConfig.__annotations__)
+        if unknown_keys:
+            supported = ', '.join(sorted(HttpClientConfig.__annotations__))
+            raise ValueError(
+                f'Unsupported http_client_config key(s): {", ".join(sorted(unknown_keys))}. Supported: {supported}'
+            )
+        if http_client_config is not None and http_client_config.get('verify') is False:
+            log.warning(
+                'TLS certificate verification is disabled for the OpenID configuration endpoint. '
+                'This endpoint supplies the token signing keys; only disable verification in development.'
+            )
+        self.http_client_config: HttpClientConfig = http_client_config.copy() if http_client_config else {}
 
         self.authorization_endpoint: str
         self.signing_keys: dict[str, AllowedPublicKeys]
@@ -52,7 +71,7 @@ class OpenIdConfig:
 
     async def load_config(self) -> None:
         """
-        Loads config from the Intility openid-config endpoint if it's over 24 hours old (or don't exist)
+        Loads config from the OpenID Connect metadata endpoint if it's over 24 hours old (or don't exist)
         """
         refresh_time = datetime.now() - timedelta(hours=24)
         if not self._config_timestamp or self._config_timestamp < refresh_time:
@@ -91,7 +110,8 @@ class OpenIdConfig:
         if self.app_id:
             config_url += f'?appid={self.app_id}'
 
-        async with AsyncClient(timeout=10, **self.http_client_config) as client:
+        client_config: dict[str, Any] = {'timeout': 10, **self.http_client_config}
+        async with AsyncClient(**client_config) as client:
             log.info('Fetching OpenID Connect config from %s', config_url)
             openid_response = await client.get(config_url)
             openid_response.raise_for_status()
