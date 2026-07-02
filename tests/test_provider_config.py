@@ -116,11 +116,6 @@ async def test_http_client_config_defaults_to_ten_second_timeout(httpx2_mock, mo
     assert captured == {'timeout': 10}
 
 
-def test_http_client_config_unknown_key_raises_at_construction():
-    with pytest.raises(ValueError, match='Unsupported http_client_config key'):
-        OpenIdConfig('vibber_tenant', http_client_config={'proxy': 'http://localhost:8080'})
-
-
 def test_http_client_config_verify_false_warns(caplog):
     with caplog.at_level(logging.WARNING, logger='fastapi_azure_auth'):
         OpenIdConfig('vibber_tenant', http_client_config={'verify': False})

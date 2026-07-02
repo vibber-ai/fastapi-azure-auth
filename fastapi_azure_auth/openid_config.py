@@ -18,7 +18,8 @@ class HttpClientConfig(TypedDict):
     Configuration for the HTTP client used to fetch the OpenID configuration and signing keys.
 
     verify - (optional) `True` (the default) verifies TLS certificates against the OS trust store,
-        an `ssl.SSLContext` or a path to a CA bundle uses a custom trust configuration, and `False`
+        an `ssl.SSLContext` uses a custom trust configuration (e.g.
+        `ssl.create_default_context(cafile='path/to/ca-bundle.pem')`), and `False`
         disables verification entirely.
 
         .. warning::
@@ -29,7 +30,7 @@ class HttpClientConfig(TypedDict):
     timeout - (optional) Request timeout in seconds. Defaults to 10.
     """
 
-    verify: NotRequired[ssl.SSLContext | str | bool]
+    verify: NotRequired[ssl.SSLContext | bool]
     trust_env: NotRequired[bool]
     timeout: NotRequired[float]
 
@@ -49,19 +50,12 @@ class OpenIdConfig:
         self.app_id = app_id
         self.config_url = config_url
 
-        # Validate eagerly and store a copy, so a typo'd key or a dict mutated by the caller
-        # can't surface as a confusing failure at the next config refresh.
-        unknown_keys = set(http_client_config or {}) - set(HttpClientConfig.__annotations__)
-        if unknown_keys:
-            supported = ', '.join(sorted(HttpClientConfig.__annotations__))
-            raise ValueError(
-                f'Unsupported http_client_config key(s): {", ".join(sorted(unknown_keys))}. Supported: {supported}'
-            )
         if http_client_config is not None and http_client_config.get('verify') is False:
             log.warning(
                 'TLS certificate verification is disabled for the OpenID configuration endpoint. '
                 'This endpoint supplies the token signing keys; only disable verification in development.'
             )
+        # Store a copy so a dict mutated by the caller can't change behaviour at the next config refresh.
         self.http_client_config: HttpClientConfig = http_client_config.copy() if http_client_config else {}
 
         self.authorization_endpoint: str
