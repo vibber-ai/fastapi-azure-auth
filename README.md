@@ -9,7 +9,7 @@
 <p align="center">
     <!-- Line 1 -->
     <a href="https://python.org">
-        <img src="https://img.shields.io/badge/python-v3.8+-blue.svg?logo=python&logoColor=white&label=python" alt="Python version">
+        <img src="https://img.shields.io/badge/python-v3.11+-blue.svg?logo=python&logoColor=white&label=python" alt="Python version">
     </a>
     <a href="https://fastapi.tiangolo.com/">
         <img src="https://img.shields.io/badge/FastAPI-0.68.0+%20-blue.svg?logo=fastapi&logoColor=white&label=fastapi" alt="FastAPI Version">
@@ -25,14 +25,11 @@
     <a href="https://github.com/pre-commit/pre-commit">
         <img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white" alt="Pre-commit">
     </a>
-    <a href="https://github.com/psf/black">
-        <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Black">
+    <a href="https://github.com/astral-sh/ruff">
+        <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff">
     </a>
     <a href="http://mypy-lang.org">
         <img src="http://www.mypy-lang.org/static/mypy_badge.svg" alt="mypy">
-    </a>
-    <a href="https://pycqa.github.io/isort/">
-        <img src="https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336" alt="isort">
     </a>
     <!-- Line 3 -->
     <br/>
@@ -77,10 +74,6 @@ For a more in-depth tutorial and settings reference you should read the
 
 #### 1. Install this library:
 ```bash
-pip install fastapi-azure-auth
-# or
-poetry add fastapi-azure-auth
-# or
 uv add fastapi-azure-auth
 ```
 

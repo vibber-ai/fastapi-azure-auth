@@ -67,7 +67,7 @@ dev = [
     "pytest-freezer>=0.4.8",
     "anyio>=4.4.0",
     "trio>=0.27.0",
-    "respx>=0.21.1,<0.22",
+    "respx>=0.22.0",
     "openapi-spec-validator>=0.7.1",
     "pydantic>=2.11.0",
     "pydantic-settings>=2.5.0",
@@ -77,11 +77,6 @@ dev = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-
-[tool.uv]
-# httpcore <1.0.9 fails to import on Python 3.14 (typing.Union change);
-# pin the floor while keeping httpx <0.28 for the test client's app= shortcut.
-constraint-dependencies = ["httpcore>=1.0.9"]
 
 [tool.ruff]
 fix = true

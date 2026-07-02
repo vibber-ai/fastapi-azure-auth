@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import pytest
 from asgi_lifespan import LifespanManager
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 
 from demo_project.api.dependencies import azure_scheme
 from demo_project.main import app
@@ -17,7 +17,9 @@ async def test_http_error_old_config_found(respx_mock, mock_config_timestamp):
         status_code=500
     )
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': f'Bearer {build_access_token()}'}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': f'Bearer {build_access_token()}'},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Connection to Azure Entra ID is down. Unable to fetch provider configuration'}
@@ -31,7 +33,9 @@ async def test_http_error_no_config_cause_crash_on_startup(respx_mock):
     with pytest.raises(RuntimeError):
         async with LifespanManager(app=app):
             async with AsyncClient(
-                app=app, base_url='http://test', headers={'Authorization': f'Bearer {build_access_token()}'}
+                transport=ASGITransport(app=app),
+                base_url='http://test',
+                headers={'Authorization': f'Bearer {build_access_token()}'},
             ) as ac:
                 await ac.get('api/v1/hello')
 
