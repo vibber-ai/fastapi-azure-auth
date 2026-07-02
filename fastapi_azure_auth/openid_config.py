@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 import jwt
 from fastapi import HTTPException, status
-from httpx import AsyncClient
+from httpx2 import AsyncClient
 
 if TYPE_CHECKING:  # pragma: no cover
     from jwt.algorithms import AllowedPublicKeys

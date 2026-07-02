@@ -2,7 +2,7 @@ import time
 from datetime import datetime, timedelta
 
 import pytest
-from httpx import ASGITransport, AsyncClient
+from httpx2 import ASGITransport, AsyncClient
 
 from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings

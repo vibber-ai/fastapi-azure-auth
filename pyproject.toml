@@ -1,6 +1,6 @@
 [project]
 name = "fastapi-azure-auth"
-version = "5.2.0"  # Remember to change in __init__.py as well
+version = "5.2.1"  # Remember to change in __init__.py as well
 description = "Easy and secure implementation of Azure Entra ID for your FastAPI APIs"
 authors = [{ name = "Jonas Krüger Svensson", email = "jonas@vibber.ai" }]
 requires-python = ">=3.11"
@@ -44,7 +44,8 @@ classifiers = [
 dependencies = [
     "fastapi>=0.111.1",
     "cryptography>=48.0.1",
-    "httpx>0.18.2",
+    "httpx2>=2.0.0",
+    "pydantic>=2.6.2",
     "pyjwt>=2.8.0,<3",
 ]
 
@@ -67,7 +68,7 @@ dev = [
     "pytest-freezer>=0.4.8",
     "anyio>=4.4.0",
     "trio>=0.27.0",
-    "respx>=0.22.0",
+    "pytest-httpx2>=1.0.0",
     "openapi-spec-validator>=0.7.1",
     "pydantic>=2.11.0",
     "pydantic-settings>=2.5.0",

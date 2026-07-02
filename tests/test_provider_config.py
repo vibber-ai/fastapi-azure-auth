@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import pytest
 from asgi_lifespan import LifespanManager
-from httpx import ASGITransport, AsyncClient
+from httpx2 import ASGITransport, AsyncClient
 
 from demo_project.api.dependencies import azure_scheme
 from demo_project.main import app
@@ -11,9 +11,9 @@ from tests.utils import build_access_token, build_openid_keys, openid_configurat
 
 
 @pytest.mark.anyio
-async def test_http_error_old_config_found(respx_mock, mock_config_timestamp):
+async def test_http_error_old_config_found(httpx2_mock, mock_config_timestamp):
     azure_scheme.openid_config._config_timestamp = datetime.now() - timedelta(weeks=1)
-    respx_mock.get('https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration').respond(
+    httpx2_mock.get('https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration').respond(
         status_code=500
     )
     async with AsyncClient(
@@ -26,8 +26,8 @@ async def test_http_error_old_config_found(respx_mock, mock_config_timestamp):
 
 
 @pytest.mark.anyio
-async def test_http_error_no_config_cause_crash_on_startup(respx_mock):
-    respx_mock.get('https://login.microsoftonline.com/vibber_tenant_id/v2.0/.well-known/openid-configuration').respond(
+async def test_http_error_no_config_cause_crash_on_startup(httpx2_mock):
+    httpx2_mock.get('https://login.microsoftonline.com/vibber_tenant_id/v2.0/.well-known/openid-configuration').respond(
         status_code=500
     )
     with pytest.raises(RuntimeError):
@@ -41,12 +41,12 @@ async def test_http_error_no_config_cause_crash_on_startup(respx_mock):
 
 
 @pytest.mark.anyio
-async def test_app_id_provided(respx_mock):
+async def test_app_id_provided(httpx2_mock):
     openid_config = OpenIdConfig('vibber_tenant', multi_tenant=False, app_id='1234567890')
-    respx_mock.get(
+    httpx2_mock.get(
         'https://login.microsoftonline.com/vibber_tenant/v2.0/.well-known/openid-configuration?appid=1234567890'
     ).respond(json=openid_configuration())
-    respx_mock.get('https://login.microsoftonline.com/vibber_tenant/discovery/v2.0/keys').respond(
+    httpx2_mock.get('https://login.microsoftonline.com/vibber_tenant/discovery/v2.0/keys').respond(
         json=build_openid_keys()
     )
     await openid_config.load_config()
@@ -54,16 +54,16 @@ async def test_app_id_provided(respx_mock):
 
 
 @pytest.mark.anyio
-async def test_custom_config_id(respx_mock):
+async def test_custom_config_id(httpx2_mock):
     openid_config = OpenIdConfig(
         'vibber_tenant',
         multi_tenant=False,
         config_url='https://login.microsoftonline.com/override_tenant/v2.0/.well-known/openid-configuration',
     )
-    respx_mock.get('https://login.microsoftonline.com/override_tenant/v2.0/.well-known/openid-configuration').respond(
+    httpx2_mock.get('https://login.microsoftonline.com/override_tenant/v2.0/.well-known/openid-configuration').respond(
         json=openid_configuration()
     )
-    respx_mock.get('https://login.microsoftonline.com/vibber_tenant/discovery/v2.0/keys').respond(
+    httpx2_mock.get('https://login.microsoftonline.com/vibber_tenant/discovery/v2.0/keys').respond(
         json=build_openid_keys()
     )
     await openid_config.load_config()

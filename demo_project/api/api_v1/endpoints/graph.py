@@ -1,9 +1,9 @@
 from typing import Any
 
-import httpx
+import httpx2
 import jwt
 from fastapi import APIRouter, Depends, Request
-from httpx import AsyncClient
+from httpx2 import AsyncClient
 
 from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings
@@ -24,7 +24,7 @@ async def graph_world(request: Request) -> Any:  # noqa: ANN401
     """
     async with AsyncClient() as client:
         # Use the users access token and fetch a new access token for the Graph API
-        obo_response: httpx.Response = await client.post(
+        obo_response: httpx2.Response = await client.post(
             f'https://login.microsoftonline.com/{settings.TENANT_ID}/oauth2/v2.0/token',
             data={
                 'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
@@ -38,7 +38,7 @@ async def graph_world(request: Request) -> Any:  # noqa: ANN401
 
         if obo_response.is_success:
             # Call the graph `/me` endpoint to fetch more information about the current user, using the new token
-            graph_response: httpx.Response = await client.get(
+            graph_response: httpx2.Response = await client.get(
                 'https://graph.microsoft.com/v1.0/me',
                 headers={'Authorization': f'Bearer {obo_response.json()["access_token"]}'},
             )
