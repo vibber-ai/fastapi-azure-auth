@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime, timedelta
 
+import anyio
+import httpx
 import pytest
 from asgi_lifespan import LifespanManager
 from httpx2 import ASGITransport, AsyncClient
@@ -9,7 +11,7 @@ from demo_project.api.dependencies import azure_scheme
 from demo_project.main import app
 from fastapi_azure_auth import HttpClientConfig, SingleTenantAzureAuthorizationCodeBearer
 from fastapi_azure_auth.openid_config import OpenIdConfig
-from tests.utils import build_access_token, build_openid_keys, openid_configuration
+from tests.utils import build_access_token, build_openid_keys, keys_url, openid_config_url, openid_configuration
 
 
 @pytest.mark.anyio
@@ -69,6 +71,32 @@ async def test_custom_config_id(httpx2_mock):
         json=build_openid_keys()
     )
     await openid_config.load_config()
+    assert len(openid_config.signing_keys) == 2
+
+
+@pytest.mark.anyio
+async def test_concurrent_refresh_requests(httpx2_mock):
+    """Concurrent refreshes of a stale config should result in exactly one fetch."""
+
+    # respx requires classic httpx.Response objects from side_effect callables (lundberg/respx#324)
+    async def slow_config_response(*args, **kwargs):
+        await anyio.sleep(0.2)
+        return httpx.Response(200, json=openid_configuration())
+
+    async def slow_keys_response(*args, **kwargs):
+        await anyio.sleep(0.2)
+        return httpx.Response(200, json=build_openid_keys())
+
+    config_route = httpx2_mock.get(openid_config_url()).mock(side_effect=slow_config_response)
+    keys_route = httpx2_mock.get(keys_url()).mock(side_effect=slow_keys_response)
+
+    openid_config = OpenIdConfig('vibber_tenant_id')
+    async with anyio.create_task_group() as task_group:
+        for _ in range(5):
+            task_group.start_soon(openid_config.load_config)
+
+    assert len(config_route.calls) == 1, 'Config endpoint called multiple times'
+    assert len(keys_route.calls) == 1, 'Keys endpoint called multiple times'
     assert len(openid_config.signing_keys) == 2
 
 

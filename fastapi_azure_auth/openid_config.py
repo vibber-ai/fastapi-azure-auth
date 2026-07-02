@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
 
 import jwt
+from anyio import Lock
 from fastapi import HTTPException, status
 from httpx2 import AsyncClient
 
@@ -63,12 +64,24 @@ class OpenIdConfig:
         self.token_endpoint: str
         self.issuer: str
 
+        self._refresh_lock: Lock = Lock()
+
+    def _config_is_fresh(self) -> bool:
+        refresh_time = datetime.now() - timedelta(hours=24)
+        return bool(self._config_timestamp and self._config_timestamp >= refresh_time)
+
     async def load_config(self) -> None:
         """
         Loads config from the OpenID Connect metadata endpoint if it's over 24 hours old (or don't exist)
         """
-        refresh_time = datetime.now() - timedelta(hours=24)
-        if not self._config_timestamp or self._config_timestamp < refresh_time:
+        # Fast path without the lock: this runs on every authenticated request.
+        if self._config_is_fresh():
+            return
+        async with self._refresh_lock:
+            # Re-check inside the lock: another task may have refreshed while we waited,
+            # so concurrent requests result in a single fetch.
+            if self._config_is_fresh():
+                return
             try:
                 log.debug('Loading Azure Entra ID OpenID configuration.')
                 await self._load_openid_config()

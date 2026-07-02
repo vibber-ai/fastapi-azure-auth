@@ -43,6 +43,7 @@ classifiers = [
 ]
 dependencies = [
     "fastapi>=0.111.1",
+    "anyio>=4.4.0",
     "cryptography>=48.0.1",
     "httpx2>=2.0.0",
     "pydantic>=2.6.2",

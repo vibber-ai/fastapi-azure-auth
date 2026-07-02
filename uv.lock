@@ -396,6 +396,7 @@ name = "fastapi-azure-auth"
 version = "5.3.0"
 source = { editable = "." }
 dependencies = [
+    { name = "anyio" },
     { name = "cryptography" },
     { name = "fastapi" },
     { name = "httpx2" },
@@ -426,6 +427,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "anyio", specifier = ">=4.4.0" },
     { name = "cryptography", specifier = ">=48.0.1" },
     { name = "fastapi", specifier = ">=0.111.1" },
     { name = "httpx2", specifier = ">=2.0.0" },

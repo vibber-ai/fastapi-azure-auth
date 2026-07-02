@@ -10,8 +10,6 @@ You can access your user object in two ways, either with `Depends(<schema name>)
 
 ### `Depends(<schema name>)`
 
-<Tabs groupId="python-version">
-<TabItem value="Python 3.9 or above">
 
 ```python title="depends_api_example.py"
 from fastapi import APIRouter, Depends
@@ -33,40 +31,10 @@ async def hello_user(user: User = Depends(azure_scheme)) -> dict[str, bool]:
     """
     return user.dict()
 ```
-</TabItem>
-
-<TabItem value="Python 3.8">
-
-```python title="depends_api_example.py"
-from fastapi import APIRouter, Depends
-from typing import Dict
-
-from demo_project.api.dependencies import azure_scheme
-from fastapi_azure_auth.user import User
-
-router = APIRouter()
-
-
-@router.get(
-    '/hello-user',
-    response_model=User,
-    operation_id='helloWorldApiKey',
-)
-async def hello_user(user: User = Depends(azure_scheme)) -> Dict[str, bool]:
-    """
-    Wonder how this auth is done?
-    """
-    return user.dict()
-```
-</TabItem>
-
-</Tabs>
 
 
 ### `request.state.user`
 
-<Tabs groupId="python-version">
-<TabItem value="Python 3.9 or above">
 
 ```python title="request_state_user_api_example.py"
 from fastapi import APIRouter, Depends, Request
@@ -89,34 +57,3 @@ async def hello_user(request: Request) -> dict[str, bool]:
     """
     return request.state.user.dict()
 ```
-
-</TabItem>
-
-<TabItem value="Python 3.8">
-
-```python title="request_state_user_api_example.py"
-from fastapi import APIRouter, Depends, Request
-from typing import Dict
-
-from demo_project.api.dependencies import azure_scheme
-from fastapi_azure_auth.user import User
-
-router = APIRouter()
-
-
-@router.get(
-    '/hello-user',
-    response_model=User,
-    operation_id='helloWorldApiKey',
-    dependencies=[Depends(azure_scheme)]
-)
-async def hello_user(request: Request) -> Dict[str, bool]:
-    """
-    Wonder how this auth is done?
-    """
-    return request.state.user.dict()
-```
-
-</TabItem>
-
-</Tabs>
