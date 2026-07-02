@@ -1,8 +1,10 @@
-const lightCodeTheme = require('prism-react-renderer').themes.github
-const darkCodeTheme = require('prism-react-renderer').themes.dracula
+import type {Config} from '@docusaurus/types';
+import type * as Preset from '@docusaurus/preset-classic';
 
-/** @type {import('@docusaurus/types').DocusaurusConfig} */
-module.exports = {
+const config: Config = {
+  future: {
+    experimental_faster: true,
+  },
   title: 'FastAPI-Azure-Auth',
   tagline: 'Easy and secure implementation of Azure Entra ID for your FastAPI APIs 🔒',
   url: 'https://your-docusaurus-test-site.com',
@@ -10,7 +12,7 @@ module.exports = {
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/global/favicon.ico',
-  organizationName: 'Intility', // Usually your GitHub org/user name.
+  organizationName: 'vibber-ai', // Usually your GitHub org/user name.
   projectName: 'FastAPI-Azure-Auth', // Usually your repo name.
   themeConfig: {
     navbar: {
@@ -21,7 +23,7 @@ module.exports = {
       },
       items: [
         {
-          href: 'https://github.com/Intility/FastAPI-Azure-Auth',
+          href: 'https://github.com/vibber-ai/fastapi-azure-auth',
           label: 'GitHub',
           position: 'right',
         },
@@ -35,15 +37,15 @@ module.exports = {
           items: [
             {
               label: 'SECURITY.md',
-              href: 'https://github.com/Intility/FastAPI-Azure-Auth/blob/main/SECURITY.md',
+              href: 'https://github.com/vibber-ai/fastapi-azure-auth/blob/main/SECURITY.md',
             },
             {
-              label: 'jonas.svensson@intility.no',
-              href: 'mailto:jonas.svensson@intility.no',
+              label: 'jonas@vibber.ai',
+              href: 'mailto:jonas@vibber.ai',
             },
             {
-              label: 'Intility.com',
-              href: 'https://intility.com',
+              label: 'Vibber.ai',
+              href: 'https://vibber.ai',
             },
             {
               label: 'Azure',
@@ -52,13 +54,9 @@ module.exports = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Intility AS. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Vibber AS. Built with Docusaurus.`,
     },
-    prism: {
-      theme: lightCodeTheme,
-      darkTheme: darkCodeTheme,
-    },
-  },
+  } satisfies Preset.ThemeConfig,
   presets: [
     [
       '@docusaurus/preset-classic',
@@ -67,13 +65,13 @@ module.exports = {
           id: 'docs',
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/Intility/FastAPI-Azure-Auth/edit/main/docs/',
+          editUrl: 'https://github.com/vibber-ai/fastapi-azure-auth/edit/main/docs/',
           sidebarCollapsible: false,
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
-      },
+      } satisfies Preset.Options,
     ],
   ],
   plugins: [
@@ -84,9 +82,11 @@ module.exports = {
   //       id: 'docs',
   //       routeBasePath: '/',
   //       sidebarPath: require.resolve('./sidebars.js'),
-  //       editUrl: 'https://github.com/Intility/FastAPI-Azure-Auth/edit/main/docs/',
+  //       editUrl: 'https://github.com/vibber-ai/fastapi-azure-auth/edit/main/docs/',
   //       sidebarCollapsible: false,
   //     },
   //   ],
   ]
 }
+
+export default config;

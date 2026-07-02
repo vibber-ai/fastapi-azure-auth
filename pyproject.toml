@@ -1,101 +1,99 @@
-[tool.poetry]
+[project]
 name = "fastapi-azure-auth"
-version = "5.1.0"  # Remember to change in __init__.py as well
+version = "5.2.1"  # Remember to change in __init__.py as well
 description = "Easy and secure implementation of Azure Entra ID for your FastAPI APIs"
-authors = ["Jonas Krüger Svensson <jonas.svensson@intility.no>"]
+authors = [{ name = "Jonas Krüger Svensson", email = "jonas@vibber.ai" }]
+requires-python = ">=3.11"
 readme = "README.md"
-homepage = "https://github.com/intility/fastapi-azure-auth"
-repository = "https://github.com/intility/fastapi-azure-auth"
-documentation = "https://github.com/intility/fastapi-azure-auth"
 keywords = [
-    'ad',
-    'async',
-    'asyncio',
-    'authentication',
-    'azure',
-    'azure ad',
-    'azure entra id',
-    'azure entra',
-    'entra id',
-    'azuread',
-    'fastapi',
-    'multi tenant',
-    'oauth2',
-    'oidc',
-    'security',
-    'single tenant',
-    'starlette',
-    'trio',
+    "ad",
+    "async",
+    "asyncio",
+    "authentication",
+    "azure",
+    "azure ad",
+    "azure entra id",
+    "azure entra",
+    "entra id",
+    "azuread",
+    "fastapi",
+    "multi tenant",
+    "oauth2",
+    "oidc",
+    "security",
+    "single tenant",
+    "starlette",
+    "trio",
 ]
-
 classifiers = [
-    'Development Status :: 5 - Production/Stable',
-    'Environment :: Web Environment',
-    'Intended Audience :: Developers',
-    'License :: OSI Approved :: MIT License',
-    'Operating System :: OS Independent',
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 3.12',
-    'Topic :: Software Development',
-    'Topic :: Software Development :: Libraries',
-    'Topic :: Software Development :: Libraries :: Application Frameworks',
-    'Topic :: Software Development :: Libraries :: Python Modules',
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "fastapi>=0.111.1",
+    "anyio>=4.4.0",
+    "cryptography>=48.0.1",
+    "httpx2>=2.0.0",
+    "pydantic>=2.6.2",
+    "pyjwt>=2.8.0,<3",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-fastapi = ">0.68.0"
-cryptography = ">=43.0.1"
-httpx = ">0.18.2"
-pyjwt = "^2.8.0"
+[project.urls]
+Homepage = "https://github.com/vibber-ai/fastapi-azure-auth"
+Repository = "https://github.com/vibber-ai/fastapi-azure-auth"
+Documentation = "https://github.com/vibber-ai/fastapi-azure-auth"
 
-
-[tool.poetry.group.dev.dependencies]
-pre-commit = "^2.9.3"
-black = "^22.1.0"
-pytest = "^8.4.0"
-pytest-cov = "^6.1.1"
-pytest-asyncio = "^1.0.0"
-pytest-mock = "^3.14.1"
-requests-mock = "^1.12.1"
-pytest-socket = "^0.7.0"
-pytest-dotenv = "^0.5.2"
-pytest-aiohttp = "^1.1.0"
-uvicorn = "^0.34.3"
-pytest-freezer = "^0.4.9"
-anyio = "^3.3.4"
-trio = "^0.30.0"
-respx = "^0.22.0"
-openapi-spec-validator = "^0.7.2"
-pydantic-settings = "^2.9.1"
-asgi-lifespan = "^2.1.0"
-
-
-[tool.black]
-line-length = 120
-skip-string-normalization = true
-target-version = ['py310']
-include = '\.pyi?$'
-exclude = '''
-(
-    (\.eggs|\.git|\.hg|\.mypy_cache|\.tox|\.venv|\venv|\.github|\docs|\tests|\__pycache__)
-)
-'''
-
-[tool.isort]
-profile = "black"
-src_paths = ["fastapi_azure_auth"]
-combine_as_imports = true
-line_length = 120
-sections = [
-    'FUTURE',
-    'STDLIB',
-    'THIRDPARTY',
-    'FIRSTPARTY',
-    'LOCALFOLDER',
+[dependency-groups]
+dev = [
+    "pre-commit>=4.0.0",
+    "pytest>=8.3.0",
+    "pytest-cov>=6.0.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest-mock>=3.14.0",
+    "requests-mock>=1.12.0",
+    "pytest-socket>=0.7.0",
+    "pytest-dotenv>=0.5.2",
+    "uvicorn>=0.32.0",
+    "pytest-freezer>=0.4.8",
+    "anyio>=4.4.0",
+    "trio>=0.27.0",
+    "pytest-httpx2>=1.0.0",
+    "openapi-spec-validator>=0.7.1",
+    "pydantic>=2.11.0",
+    "pydantic-settings>=2.5.0",
+    "asgi-lifespan>=2.1.0",
 ]
-
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+fix = true
+line-length = 120
+target-version = 'py311'
+
+[tool.ruff.lint]
+# Defaults plus import sorting (replaces isort) and modern-syntax upgrades (replaces pyupgrade)
+extend-select = ["I", "UP"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+known-first-party = ["fastapi_azure_auth"]
+
+[tool.ruff.format]
+docstring-code-format = true
+line-ending = "lf"
+quote-style = "single"

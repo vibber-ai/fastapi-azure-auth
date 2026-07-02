@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -19,7 +19,7 @@ class Claims(BaseModel):
         description='Identifies the STS that constructs and returns the token, and the Azure Entra ID tenant of the'
         ' authenticated user. If the token issued is a v2.0 token (see the ver claim), the URI ends in /v2.0.',
     )
-    idp: Optional[str] = Field(
+    idp: str | None = Field(
         default=None,
         description='Records the identity provider that authenticated the subject of the token. This value is identical'
         ' to the value of the Issuer claim unless the user account is not in the same tenant as the issuer, such as'
@@ -37,27 +37,27 @@ class Claims(BaseModel):
         ...,
         description='Specifies the expiration time before which the JWT can be accepted for processing.',
     )
-    aio: Optional[str] = Field(
+    aio: str | None = Field(
         default=None,
         description='An internal claim used by Azure Entra ID to record data for token reuse. Resources should not use this claim.',
     )
-    name: Optional[str] = Field(
+    name: str | None = Field(
         default=None,
         description='Provides a human-readable value that identifies the subject of the token.',
     )
-    scp: List[str] = Field(
+    scp: list[str] = Field(
         default=[],
         description='The set of scopes exposed by the application for which the client application has requested (and received) consent. Only included for user tokens.',
     )
-    roles: List[str] = Field(
+    roles: list[str] = Field(
         default=[],
         description='The set of permissions exposed by the application that the requesting application or user has been given permission to call.',
     )
-    wids: List[str] = Field(
+    wids: list[str] = Field(
         default=[],
         description='Denotes the tenant-wide roles assigned to this user, from the section of roles present in Azure Entra ID built-in roles.',
     )
-    groups: List[str] = Field(
+    groups: list[str] = Field(
         default=[],
         description='Provides object IDs that represent the group memberships of the subject.',
     )
@@ -65,19 +65,19 @@ class Claims(BaseModel):
         ...,
         description='The principal associated with the token.',
     )
-    oid: Optional[str] = Field(
+    oid: str | None = Field(
         default=None,
         description='The immutable identifier for the requestor, which is the verified identity of the user or service principal',
     )
-    tid: Optional[str] = Field(
+    tid: str | None = Field(
         default=None,
         description='Represents the tenant that the user is signing in to',
     )
-    uti: Optional[str] = Field(
+    uti: str | None = Field(
         default=None,
         description='Token identifier claim, equivalent to jti in the JWT specification. Unique, per-token identifier that is case-sensitive.',
     )
-    rh: Optional[str] = Field(
+    rh: str | None = Field(
         default=None,
         description='Token identifier claim, equivalent to jti in the JWT specification. Unique, per-token identifier that is case-sensitive.',
     )
@@ -87,151 +87,151 @@ class Claims(BaseModel):
     )
 
     # Optional claims, configured in Azure Entra ID
-    acct: Optional[int] = Field(
+    acct: int | None = Field(
         default=None,
         description="User's account status in tenant",
     )
-    auth_time: Optional[int] = Field(
+    auth_time: int | None = Field(
         default=None,
         description='Time when the user last authenticated; See OpenID Connect spec',
     )
-    ctry: Optional[str] = Field(
+    ctry: str | None = Field(
         default=None,
         description="User's country/region",
     )
-    email: Optional[str] = Field(
+    email: str | None = Field(
         default=None,
         description='The addressable email for this user, if the user has one',
     )
-    family_name: Optional[str] = Field(
+    family_name: str | None = Field(
         default=None,
         description='Provides the last name, surname, or family name of the user as defined in the user object',
     )
-    fwd: Optional[str] = Field(
+    fwd: str | None = Field(
         default=None,
         description='IP address',
     )
-    given_name: Optional[str] = Field(
+    given_name: str | None = Field(
         default=None,
         description='Provides the first or "given" name of the user, as set on the user object',
     )
-    idtyp: Optional[str] = Field(
+    idtyp: str | None = Field(
         default=None,
         description='Signals whether the token is an app-only token',
     )
-    in_corp: Optional[str] = Field(
+    in_corp: str | None = Field(
         default=None,
         description='Signals if the client is logging in from the corporate network; if they are not, the claim is not included',
     )
-    ipaddr: Optional[str] = Field(
+    ipaddr: str | None = Field(
         default=None,
         description='The IP address the user authenticated from.',
     )
-    login_hint: Optional[str] = Field(
+    login_hint: str | None = Field(
         default=None,
         description='Login hint',
     )
-    onprem_sid: Optional[str] = Field(
+    onprem_sid: str | None = Field(
         default=None,
         description='On-premises security identifier',
     )
-    pwd_exp: Optional[str] = Field(
+    pwd_exp: str | None = Field(
         default=None,
         description='The datetime at which the password expires',
     )
-    pwd_url: Optional[str] = Field(
+    pwd_url: str | None = Field(
         default=None,
         description='A URL that the user can visit to change their password',
     )
-    sid: Optional[str] = Field(
+    sid: str | None = Field(
         default=None,
         description='Session ID, used for per-session user sign out',
     )
-    tenant_ctry: Optional[str] = Field(
+    tenant_ctry: str | None = Field(
         default=None,
         description="Resource tenant's country/region",
     )
-    tenant_region_scope: Optional[str] = Field(
+    tenant_region_scope: str | None = Field(
         default=None,
         description='Region of the resource tenant',
     )
-    upn: Optional[str] = Field(
+    upn: str | None = Field(
         default=None,
         description='An identifier for the user that can be used with the username_hint parameter; not a durable identifier for the user and should not be used to key data',
     )
-    verified_primary_email: List[str] = Field(
+    verified_primary_email: list[str] = Field(
         default=[],
         description="Sourced from the user's PrimaryAuthoritativeEmail",
     )
-    verified_secondary_email: List[str] = Field(
+    verified_secondary_email: list[str] = Field(
         default=[],
         description="Sourced from the user's SecondaryAuthoritativeEmail",
     )
-    vnet: Optional[str] = Field(
+    vnet: str | None = Field(
         default=None,
         description='VNET specifier information',
     )
-    xms_pdl: Optional[str] = Field(
+    xms_pdl: str | None = Field(
         default=None,
         description='Preferred data location',
     )
-    xms_pl: Optional[str] = Field(
+    xms_pl: str | None = Field(
         default=None,
         description='User-preferred language',
     )
-    xms_tpl: Optional[str] = Field(
+    xms_tpl: str | None = Field(
         default=None,
         description='Tenant-preferred language',
     )
-    ztdid: Optional[str] = Field(
+    ztdid: str | None = Field(
         default=None,
         description='Zero-touch Deployment ID',
     )
 
     # V1.0 only
-    acr: Optional[Literal['0', '1']] = Field(
+    acr: Literal['0', '1'] | None = Field(
         default=None,
         description='A value of 0 for the "Authentication context class" claim indicates the end-user authentication '
         'did not meet the requirements of ISO/IEC 29115. Only available in V1.0 tokens',
     )
     # V1.0 only
-    amr: List[str] = Field(
+    amr: list[str] = Field(
         default=[],
         description='Identifies the authentication method of the subject of the token. Only available in V1.0 tokens',
     )
     # V1.0 only
-    appid: Optional[str] = Field(
+    appid: str | None = Field(
         default=None,
         description='The application ID of the client using the token. Only available in V1.0 tokens',
     )
     # V1.0 only
-    appidacr: Optional[Literal['0', '1', '2']] = Field(
+    appidacr: Literal['0', '1', '2'] | None = Field(
         default=None,
         description='Indicates authentication method of the client. Only available in V1.0 tokens',
     )
     # V1.0 only
-    unique_name: Optional[str] = Field(
+    unique_name: str | None = Field(
         default=None,
         description='Provides a human readable value that identifies the subject of the token. Only available in V1.0 tokens',
     )
 
     # V2.0 only
-    azp: Optional[str] = Field(
+    azp: str | None = Field(
         default=None,
         description='The application ID of the client using the token. Only available in V2.0 tokens',
     )
     # V2.0 only
-    azpacr: Optional[Literal['0', '1', '2']] = Field(
+    azpacr: Literal['0', '1', '2'] | None = Field(
         default=None,
         description='Indicates the authentication method of the client. Only available in V2.0 tokens',
     )
     # V2.0 only
-    preferred_username: Optional[str] = Field(
+    preferred_username: str | None = Field(
         default=None,
         description='The primary username that represents the user. Only available in V2.0 tokens',
     )
 
-    @field_validator('scp', mode="before")
+    @field_validator('scp', mode='before')
     def scopes_to_list(cls, v: object) -> object:
         """
         Validator on the scope attribute that convert the space separated list
@@ -241,7 +241,7 @@ class Claims(BaseModel):
 
 
 class User(Claims):
-    claims: Dict[str, Any] = Field(
+    claims: dict[str, Any] = Field(
         ...,
         description='The entire decoded token',
     )

@@ -4,4 +4,4 @@ from fastapi_azure_auth.auth import (  # noqa: F401
     SingleTenantAzureAuthorizationCodeBearer as SingleTenantAzureAuthorizationCodeBearer,
 )
 
-__version__ = '5.1.0'
+__version__ = '5.2.1'
