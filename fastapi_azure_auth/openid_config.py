@@ -1,10 +1,10 @@
 import logging
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any
 
 import jwt
 from fastapi import HTTPException, status
-from httpx import AsyncClient
+from httpx2 import AsyncClient
 
 if TYPE_CHECKING:  # pragma: no cover
     from jwt.algorithms import AllowedPublicKeys
@@ -15,19 +15,19 @@ log = logging.getLogger('fastapi_azure_auth')
 class OpenIdConfig:
     def __init__(
         self,
-        tenant_id: Optional[str] = None,
+        tenant_id: str | None = None,
         multi_tenant: bool = False,
-        app_id: Optional[str] = None,
-        config_url: Optional[str] = None,
+        app_id: str | None = None,
+        config_url: str | None = None,
     ) -> None:
-        self.tenant_id: Optional[str] = tenant_id
-        self._config_timestamp: Optional[datetime] = None
+        self.tenant_id: str | None = tenant_id
+        self._config_timestamp: datetime | None = None
         self.multi_tenant: bool = multi_tenant
         self.app_id = app_id
         self.config_url = config_url
 
         self.authorization_endpoint: str
-        self.signing_keys: dict[str, 'AllowedPublicKeys']
+        self.signing_keys: dict[str, AllowedPublicKeys]
         self.token_endpoint: str
         self.issuer: str
 
@@ -88,7 +88,7 @@ class OpenIdConfig:
             jwks_response.raise_for_status()
             self._load_keys(jwks_response.json()['keys'])
 
-    def _load_keys(self, keys: List[Dict[str, Any]]) -> None:
+    def _load_keys(self, keys: list[dict[str, Any]]) -> None:
         """
         Create certificates based on signing keys and store them
         """

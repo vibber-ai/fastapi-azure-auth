@@ -2,8 +2,10 @@ import time
 from datetime import datetime, timedelta
 
 import pytest
+from httpx2 import ASGITransport, AsyncClient
+
 from demo_project.main import app
-from httpx import ASGITransport, AsyncClient
+from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
@@ -13,8 +15,6 @@ from tests.utils import (
     build_access_token_normal_user,
     build_evil_access_token,
 )
-
-from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
 
 
 @pytest.mark.anyio
@@ -114,7 +114,9 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys):
 @pytest.mark.anyio
 async def test_no_keys_to_decode_with(single_tenant_app, mock_openid_and_empty_keys):
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {
@@ -127,7 +129,7 @@ async def test_no_keys_to_decode_with(single_tenant_app, mock_openid_and_empty_k
 @pytest.mark.anyio
 async def test_normal_user_rejected(single_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_normal_user()},
     ) as ac:
@@ -139,7 +141,7 @@ async def test_normal_user_rejected(single_tenant_app, mock_openid_and_keys):
 @pytest.mark.anyio
 async def test_guest_user_rejected(single_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_guest_user()},
     ) as ac:
@@ -151,7 +153,7 @@ async def test_guest_user_rejected(single_tenant_app, mock_openid_and_keys):
 @pytest.mark.anyio
 async def test_invalid_token_claims(single_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()},
     ) as ac:
@@ -164,7 +166,7 @@ async def test_invalid_token_claims(single_tenant_app, mock_openid_and_keys):
 @pytest.mark.anyio
 async def test_no_valid_keys_for_token(single_tenant_app, mock_openid_and_no_valid_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()},
     ) as ac:
@@ -179,7 +181,7 @@ async def test_no_valid_keys_for_token(single_tenant_app, mock_openid_and_no_val
 @pytest.mark.anyio
 async def test_no_valid_scopes(single_tenant_app, mock_openid_and_no_valid_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes()},
     ) as ac:
@@ -191,7 +193,7 @@ async def test_no_valid_scopes(single_tenant_app, mock_openid_and_no_valid_keys)
 @pytest.mark.anyio
 async def test_no_valid_invalid_scope(single_tenant_app, mock_openid_and_no_valid_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes()},
     ) as ac:
@@ -203,7 +205,7 @@ async def test_no_valid_invalid_scope(single_tenant_app, mock_openid_and_no_vali
 @pytest.mark.anyio
 async def test_no_valid_invalid_formatted_scope(single_tenant_app, mock_openid_and_no_valid_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes(scopes=None)},
     ) as ac:
@@ -218,7 +220,7 @@ async def test_no_valid_invalid_formatted_scope(single_tenant_app, mock_openid_a
 @pytest.mark.anyio
 async def test_expired_token(single_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_expired()},
     ) as ac:
@@ -232,7 +234,7 @@ async def test_expired_token(single_tenant_app, mock_openid_and_keys):
 async def test_evil_token(single_tenant_app, mock_openid_and_keys):
     """Kid matches what we expect, but it's not signed correctly"""
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_evil_access_token()},
     ) as ac:
@@ -246,7 +248,9 @@ async def test_evil_token(single_tenant_app, mock_openid_and_keys):
 async def test_malformed_token(single_tenant_app, mock_openid_and_keys):
     """A short token, that only has a broken header"""
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cI6IkpXVCJ9'}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cI6IkpXVCJ9'},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Invalid token format'}}
@@ -261,7 +265,7 @@ async def test_malformed_token(single_tenant_app, mock_openid_and_keys):
 async def test_only_header(single_tenant_app, mock_openid_and_keys):
     """Only header token, with a matching kid, so the rest of the logic will be called, but can't be validated"""
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={
             'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6InJlYWwgdGh1bWJ'
@@ -281,7 +285,7 @@ async def test_only_header(single_tenant_app, mock_openid_and_keys):
 async def test_none_token(single_tenant_app, mock_openid_and_keys, mocker):
     mocker.patch.object(AzureAuthorizationCodeBearerBase, 'extract_access_token', return_value=None)
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_expired()},
     ) as ac:
@@ -298,14 +302,14 @@ async def test_none_token(single_tenant_app, mock_openid_and_keys, mocker):
 async def test_exception_raised(single_tenant_app, mock_openid_and_keys, mocker):
     mocker.patch.object(AzureAuthorizationCodeBearerBase, 'validate', side_effect=ValueError('lol'))
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_expired()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Unable to process token'}}
     assert response.status_code == 401
-    print(f"header: {response.headers.get('www-authenticate')}")
+    print(f'header: {response.headers.get("www-authenticate")}')
     assert response.headers['www-authenticate'] == 'Bearer'
 
 
@@ -319,7 +323,9 @@ async def test_change_of_keys_works(single_tenant_app, mock_openid_ok_then_empty
     * Do request
     """
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.status_code == 200
@@ -327,7 +333,9 @@ async def test_change_of_keys_works(single_tenant_app, mock_openid_ok_then_empty
     freezer.move_to(datetime.now() + timedelta(hours=25))  # The keys fetched are now outdated
 
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token()},
     ) as ac:
         second_resonse = await ac.get('api/v1/hello')
     assert second_resonse.json() == {
@@ -343,7 +351,9 @@ async def test_authentication_params_from_header(single_tenant_app):
     * Send request with "Authorization: Bearer"
     * Validate response provides authorization uri and client id in header
     """
-    async with AsyncClient(app=app, base_url='http://test', headers={'Authorization': 'Bearer'}) as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url='http://test', headers={'Authorization': 'Bearer'}
+    ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.status_code == 401
     assert (

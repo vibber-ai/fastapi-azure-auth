@@ -1,5 +1,4 @@
 import time
-from typing import Optional
 
 import jwt
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
@@ -64,8 +63,8 @@ def build_access_token_expired():
 
 
 def do_build_access_token(
-    tenant_id: Optional[str] = None,
-    aud: Optional[str] = None,
+    tenant_id: str | None = None,
+    aud: str | None = None,
     expired: bool = False,
     evil: bool = False,
     admin: bool = True,

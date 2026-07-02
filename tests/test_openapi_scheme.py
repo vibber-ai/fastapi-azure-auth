@@ -2,9 +2,10 @@ import fastapi
 import openapi_spec_validator
 import pydantic
 import pytest
-from demo_project.main import app
 from fastapi.testclient import TestClient
 from packaging import version
+
+from demo_project.main import app
 
 openapi_schema = {
     'openapi': '3.1.0',
@@ -28,7 +29,7 @@ openapi_schema = {
                         },
                     }
                 },
-                'security': [{'AzureAD_PKCE_single_tenant': []}, {'AzureAD_PKCE_single_tenant': []}],
+                'security': [{'AzureAD_PKCE_single_tenant': ['user_impersonation']}],
             }
         },
         '/api/v1/hello-multi-auth': {
@@ -369,7 +370,12 @@ openapi_schema = {
                         'title': 'Preferred Username',
                         'description': 'The primary username that represents the user. Only available in V2.0 tokens',
                     },
-                    'claims': {'type': 'object', 'title': 'Claims', 'description': 'The entire decoded token'},
+                    'claims': {
+                        'additionalProperties': True,
+                        'type': 'object',
+                        'title': 'Claims',
+                        'description': 'The entire decoded token',
+                    },
                     'access_token': {
                         'type': 'string',
                         'title': 'Access Token',
@@ -443,7 +449,8 @@ def test_client():
 
 
 @pytest.mark.skipif(
-    version.parse(fastapi.__version__) < version.parse('0.99.0'), reason='Different schema in older fastapi version'
+    version.parse(fastapi.__version__) < version.parse('0.138.0'),
+    reason='OpenAPI schema (security scopes) differs on older FastAPI versions',
 )
 @pytest.mark.skipif(
     version.parse(pydantic.__version__) < version.parse('2.6.2'), reason='Different schema with older pydantic version'
@@ -451,7 +458,6 @@ def test_client():
 def test_openapi_schema(test_client):
     response = test_client.get('api/v1/openapi.json')
     assert response.status_code == 200, response.text
-    print(response.json())
     assert response.json() == openapi_schema
 
 

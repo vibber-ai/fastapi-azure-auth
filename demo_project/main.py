@@ -1,14 +1,15 @@
 import logging
 from argparse import ArgumentParser
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 import uvicorn
+from fastapi import FastAPI, Security
+from fastapi.middleware.cors import CORSMiddleware
+
 from demo_project.api.api_v1.api import api_router_azure_auth, api_router_graph, api_router_multi_auth
 from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings
-from fastapi import FastAPI, Security
-from fastapi.middleware.cors import CORSMiddleware
 
 log = logging.getLogger(__name__)
 

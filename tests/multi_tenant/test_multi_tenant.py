@@ -2,10 +2,14 @@ import time
 from datetime import datetime, timedelta
 
 import pytest
+from httpx2 import ASGITransport, AsyncClient
+
 from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings
 from demo_project.main import app
-from httpx import ASGITransport, AsyncClient
+from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
+from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
+from fastapi_azure_auth.exceptions import UnauthorizedHttp
 from tests.multi_tenant.conftest import generate_azure_scheme_multi_tenant_object
 from tests.utils import (
     build_access_token,
@@ -16,10 +20,6 @@ from tests.utils import (
     build_access_token_normal_user,
     build_evil_access_token,
 )
-
-from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
-from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
-from fastapi_azure_auth.exceptions import UnauthorizedHttp
 
 
 @pytest.mark.anyio
@@ -121,7 +121,9 @@ async def test_normal_user(multi_tenant_app, mock_openid_and_keys, freezer):
 @pytest.mark.anyio
 async def test_no_keys_to_decode_with(multi_tenant_app, mock_openid_and_empty_keys):
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {
@@ -139,7 +141,9 @@ async def test_iss_callable_raise_error(mock_openid_and_keys):
 
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {
@@ -159,7 +163,9 @@ async def test_skip_iss_validation(mock_openid_and_keys):
     )
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.status_code == 200, response.json()
@@ -168,7 +174,7 @@ async def test_skip_iss_validation(mock_openid_and_keys):
 @pytest.mark.anyio
 async def test_normal_user_rejected(multi_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_normal_user()},
     ) as ac:
@@ -180,7 +186,7 @@ async def test_normal_user_rejected(multi_tenant_app, mock_openid_and_keys):
 @pytest.mark.anyio
 async def test_guest_user_rejected(multi_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_guest_user()},
     ) as ac:
@@ -192,7 +198,7 @@ async def test_guest_user_rejected(multi_tenant_app, mock_openid_and_keys):
 @pytest.mark.anyio
 async def test_invalid_token_claims(multi_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()},
     ) as ac:
@@ -204,7 +210,7 @@ async def test_invalid_token_claims(multi_tenant_app, mock_openid_and_keys):
 @pytest.mark.anyio
 async def test_no_valid_keys_for_token(multi_tenant_app, mock_openid_and_no_valid_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()},
     ) as ac:
@@ -218,7 +224,7 @@ async def test_no_valid_keys_for_token(multi_tenant_app, mock_openid_and_no_vali
 @pytest.mark.anyio
 async def test_no_valid_scopes(multi_tenant_app, mock_openid_and_no_valid_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes()},
     ) as ac:
@@ -230,7 +236,7 @@ async def test_no_valid_scopes(multi_tenant_app, mock_openid_and_no_valid_keys):
 @pytest.mark.anyio
 async def test_no_valid_invalid_formatted_scope(multi_tenant_app, mock_openid_and_no_valid_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes(scopes=None)},
     ) as ac:
@@ -244,7 +250,7 @@ async def test_no_valid_invalid_formatted_scope(multi_tenant_app, mock_openid_an
 @pytest.mark.anyio
 async def test_expired_token(multi_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_expired()},
     ) as ac:
@@ -257,7 +263,7 @@ async def test_expired_token(multi_tenant_app, mock_openid_and_keys):
 async def test_evil_token(multi_tenant_app, mock_openid_and_keys):
     """Kid matches what we expect, but it's not signed correctly"""
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_evil_access_token()},
     ) as ac:
@@ -274,7 +280,9 @@ async def test_evil_token(multi_tenant_app, mock_openid_and_keys):
 async def test_malformed_token(multi_tenant_app, mock_openid_and_keys):
     """A short token, that only has a broken header"""
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cI6IkpXVCJ9'}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cI6IkpXVCJ9'},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': {'error': 'invalid_token', 'message': 'Invalid token format'}}
@@ -285,7 +293,7 @@ async def test_malformed_token(multi_tenant_app, mock_openid_and_keys):
 async def test_only_header(multi_tenant_app, mock_openid_and_keys):
     """Only header token, with a matching kid, so the rest of the logic will be called, but can't be validated"""
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={
             'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6InJlYWwgdGh1bWJ'
@@ -301,7 +309,7 @@ async def test_only_header(multi_tenant_app, mock_openid_and_keys):
 async def test_exception_raised(multi_tenant_app, mock_openid_and_keys, mocker):
     mocker.patch.object(AzureAuthorizationCodeBearerBase, 'validate', side_effect=ValueError('lol'))
     async with AsyncClient(
-        app=app,
+        transport=ASGITransport(app=app),
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_expired()},
     ) as ac:
@@ -320,7 +328,9 @@ async def test_change_of_keys_works(multi_tenant_app, mock_openid_ok_then_empty,
     * Do request
     """
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.status_code == 200
@@ -328,7 +338,9 @@ async def test_change_of_keys_works(multi_tenant_app, mock_openid_ok_then_empty,
     freezer.move_to(datetime.now() + timedelta(hours=25))  # The keys fetched are now outdated
 
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+        transport=ASGITransport(app=app),
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token()},
     ) as ac:
         second_resonse = await ac.get('api/v1/hello')
     assert second_resonse.json() == {

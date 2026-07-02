@@ -1,5 +1,3 @@
-from typing import List, Optional, Union
-
 import pydantic
 from pydantic import AnyHttpUrl, Field, HttpUrl
 
@@ -26,10 +24,10 @@ class Settings(AzureActiveDirectory):
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
-    BACKEND_CORS_ORIGINS: List[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
 
     PROJECT_NAME: str = 'My Project'
-    SENTRY_DSN: Optional[HttpUrl] = None
+    SENTRY_DSN: HttpUrl | None = None
 
     model_config = SettingsConfigDict(
         env_file='demo_project/.env', env_file_encoding='utf-8', extra='ignore', case_sensitive=True

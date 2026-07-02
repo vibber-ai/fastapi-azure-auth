@@ -1,9 +1,9 @@
-from typing import Any, Dict
+from typing import Any
 
 import jwt
 
 
-def is_guest(claims: Dict[str, Any]) -> bool:
+def is_guest(claims: dict[str, Any]) -> bool:
     """
     Check if the user is a guest user
     """
@@ -16,14 +16,14 @@ def is_guest(claims: Dict[str, Any]) -> bool:
     return idp != claims_iss
 
 
-def get_unverified_header(access_token: str) -> Dict[str, Any]:
+def get_unverified_header(access_token: str) -> dict[str, Any]:
     """
     Get header from the access token without verifying the signature
     """
     return dict(jwt.get_unverified_header(access_token))
 
 
-def get_unverified_claims(access_token: str) -> Dict[str, Any]:
+def get_unverified_claims(access_token: str) -> dict[str, Any]:
     """
     Get claims from the access token without verifying the signature
     """
